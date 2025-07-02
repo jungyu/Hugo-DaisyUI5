@@ -16,23 +16,33 @@
 ## 📁 文檔結構
 
 ```
-從零建構/
-├── Build-Prompts.md        # 完整建構指南 (主要文檔)
+建構參照/
+├── Hugo-Structure.md       # Hugo 官方架構標準
 ├── Project-Config.md       # 專案技術配置規格
 ├── Project-Structure.md    # 專案目錄結構
-└── Hugo-Structure.md       # Hugo 官方架構標準
+└── Cloud-Hosting.md        # 雲端部署配置
+
+Prompts/
+├── Build-Prompts-1.md      # 原始建構指南
+├── Build-Prompts-1-add.md  # 補充建構指南 (實際缺失項目)
+├── Build-Prompts-2.md      # 進階功能建構
+├── Build-Prompts-3.md      # 部署與優化指南
+└── [其他專項指南...]
 ```
 
 ## 🚀 快速開始
 
-### 1. 查看建構指南
-閱讀 [`Build-Prompts.md`](./從零建構/Build-Prompts.md) 獲得完整的分步建構指令。
+### 1. 查看主要建構指南
+閱讀 [`Build-Prompts-1.md`](./Prompts/Build-Prompts-1.md) 獲得完整的分步建構指令。
 
-### 2. 了解技術規格
-參考 [`Project-Config.md`](./從零建構/Project-Config.md) 了解詳細的技術配置。
+### 2. 查看補充建構指南 ⭐
+**重要**: 請同時參考 [`Build-Prompts-1-add.md`](./Prompts/Build-Prompts-1-add.md) 了解實際建構過程中發現的缺失項目和自動補充的內容。
 
-### 3. 理解專案結構
-查看 [`Project-Structure.md`](./從零建構/Project-Structure.md) 了解目錄組織。
+### 3. 了解技術規格
+參考 [`Project-Config.md`](./建構參照/Project-Config.md) 了解詳細的技術配置。
+
+### 4. 理解專案結構
+查看 [`Project-Structure.md`](./建構參照/Project-Structure.md) 了解目錄組織。
 
 ## 📋 建構階段
 
@@ -113,23 +123,9 @@ Build-Prompts.md 包含 12 個完整階段：
 
 ---
 
-**立即開始** → 查看 [`Build-Prompts.md`](./從零建構/Build-Prompts.md)
-內容架構: 部落格文章的組織方式和 Front Matter 格式
-數據架構: 作者、輪播等數據文件結構
-建構流程: 開發和生產環境的建構流程
-功能模組: JavaScript/CSS 功能模組架構
-部署架構: Firebase Hosting 部署配置
-3. Build-Prompts.md
-10個階段: 從環境準備到持續優化的完整建構流程
-詳細指令: 每個步驟的具體命令和配置
-模組化開發: JavaScript 功能模組的分步創建
-配置文件: 所有必要配置文件的創建指令
-測試驗證: 開發和生產環境的測試流程
-優化建議: 性能、SEO 和監控的優化策略
-專案特色技術亮點
-現代化工具鏈: Hugo + Tailwind CSS + Alpine.js 的完美結合
-功能豐富: 支援數學公式、圖表渲染、搜尋、主題切換
-開發體驗: 熱重載、模組化開發、TypeScript 支援
-性能優化: 代碼分割、資源優化、CDN 部署
-中文支援: 完整的繁體中文本地化
-這些文檔提供了完整的專案理解和重建指南，可以幫助其他開發者快速理解和複製這個專案架構。
+**立即開始** →
+
+1. 查看 [`Build-Prompts-1.md`](./Prompts/Build-Prompts-1.md) 主要建構指南
+2. **重要**: 參考 [`Build-Prompts-1-add.md`](./Prompts/Build-Prompts-1-add.md) 補充建構指南
+
+> 💡 **建議**: `Build-Prompts-1-add.md` 記錄了實際建構過程中發現的重要缺失項目，包括 JavaScript 模組、Hugo 配置修正、模板系統補充等，是成功建構專案的關鍵參考文檔。
