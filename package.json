@@ -1,0 +1,73 @@
+{
+  "name": "hugo-daisyui5",
+  "version": "1.0.0",
+  "description": "Modern Hugo theme with TailwindCSS v4.1.11 + DaisyUI v5.0.43 + Alpine.js v3.14.9",
+  "keywords": [
+    "hugo",
+    "tailwindcss",
+    "daisyui",
+    "alpine.js",
+    "static-site",
+    "blog",
+    "theme"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/hugo-daisyui5"
+  },
+  "homepage": "https://yourusername.github.io/hugo-daisyui5",
+  "engines": {
+    "node": ">=18.0.0",
+    "yarn": ">=4.6.0"
+  },
+  "scripts": {
+    "dev": "hugo server --buildDrafts --buildFuture --disableFastRender",
+    "build": "hugo --minify --gc",
+    "build:dev": "hugo --buildDrafts --buildFuture",
+    "preview": "hugo server --environment production --disableFastRender",
+    "clean": "rm -rf public resources .hugo_build.lock",
+    "lint": "stylelint '**/*.css' && markdownlint '**/*.md'",
+    "format": "prettier --write .",
+    "deps:update": "yarn upgrade-interactive",
+    "deps:audit": "yarn audit",
+    "css:build": "tailwindcss -i ./assets/css/app.css -o ./static/css/app.css --watch",
+    "css:minify": "tailwindcss -i ./assets/css/app.css -o ./static/css/app.css --minify",
+    "js:build": "esbuild assets/js/main.js --bundle --outfile=static/js/main.js --watch",
+    "js:minify": "esbuild assets/js/main.js --bundle --outfile=static/js/main.js --minify",
+    "deploy:github": "gh-pages -d public",
+    "deploy:netlify": "netlify deploy --prod --dir public",
+    "deploy:vercel": "vercel --prod",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.9",
+    "@tailwindcss/typography": "^0.5.15",
+    "autoprefixer": "^10.4.20",
+    "cssnano": "^7.0.6",
+    "daisyui": "^5.0.43",
+    "esbuild": "^0.24.0",
+    "gh-pages": "^6.1.1",
+    "markdownlint-cli": "^0.43.0",
+    "netlify-cli": "^17.37.1",
+    "postcss": "^8.5.1",
+    "postcss-cli": "^11.0.0",
+    "prettier": "^3.4.2",
+    "stylelint": "^16.12.0",
+    "stylelint-config-standard": "^36.0.1",
+    "tailwindcss": "^4.1.11",
+    "vercel": "^37.13.0"
+  },
+  "dependencies": {
+    "alpinejs": "^3.14.9"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ],
+  "packageManager": "yarn@4.6.0"
+}

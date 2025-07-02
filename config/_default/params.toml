@@ -1,0 +1,108 @@
+# TWDA v5 主題參數配置
+# 基於 Hugo v0.147.9 + TailwindCSS v4.1.11 + DaisyUI v5.0.43
+
+# 網站基本資訊
+title = "Hugo + DaisyUI 5 網站"
+description = "基於 Hugo、TailwindCSS 與 DaisyUI 5 構建的現代化靜態網站"
+keywords = ["Hugo", "TailwindCSS", "DaisyUI", "靜態網站", "部落格"]
+
+# 主題設定
+theme = "dracula"  # DaisyUI 預設主題
+logo = "/images/logo.svg"
+favicon = "/icons/favicon.ico"
+
+# 作者資訊
+[author]
+name = "網站管理員"
+email = "admin@example.com"
+bio = "熱愛技術的開發者"
+avatar = "/images/avatar.jpg"
+
+# 社群連結
+[social]
+github = "https://github.com/yourusername"
+twitter = "https://twitter.com/yourusername"
+linkedin = "https://linkedin.com/in/yourusername"
+facebook = "https://facebook.com/yourusername"
+
+# 功能開關
+[features]
+search = true
+comments = true
+toc = true
+reading_time = true
+post_navigation = true
+related_posts = true
+share_buttons = true
+dark_mode = true
+
+# 首頁設定
+[homepage]
+hero_title = "歡迎來到 TWDA v5"
+hero_subtitle = "基於 Hugo + TailwindCSS + DaisyUI 的現代化主題"
+hero_cta_text = "開始探索"
+hero_cta_link = "/blogs/"
+featured_posts = true
+posts_per_page = 6
+
+# 部落格設定
+[blog]
+posts_per_page = 10
+enable_summary = true
+summary_length = 150
+enable_tags = true
+enable_categories = true
+enable_authors = true
+
+# SEO 設定
+[seo]
+meta_title_suffix = " - TWDA v5"
+meta_description_length = 160
+enable_json_ld = true
+enable_open_graph = true
+enable_twitter_cards = true
+
+# 圖片設定
+[images]
+default_featured = "/images/default-featured.jpg"
+enable_lazy_loading = true
+enable_webp = true
+enable_responsive = true
+
+# 多語系設定
+[i18n]
+default_language = "zh-tw"
+enable_multilingual = false
+
+# 分析工具
+[analytics]
+google_analytics = ""
+gtag = ""
+
+# 留言系統
+[comments]
+provider = "disqus"  # disqus, utterances, giscus
+disqus_shortname = ""
+utterances_repo = ""
+giscus_repo = ""
+
+# 搜尋功能
+[search]
+provider = "fuse"  # fuse, algolia
+enable_search_index = true
+search_placeholder = "搜尋文章..."
+
+# PWA 設定
+[pwa]
+enable = false
+name = "TWDA v5"
+short_name = "TWDA"
+theme_color = "#000000"
+background_color = "#ffffff"
+
+# 性能優化
+[performance]
+enable_minify = true
+enable_fingerprint = true
+enable_gzip = true
+enable_cache_busting = true

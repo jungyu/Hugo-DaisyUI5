@@ -1,0 +1,48 @@
+# 輸出格式配置
+# 為 Hugo 網站定義各種輸出格式
+
+[outputFormats]
+
+# RSS 訂閱格式
+[outputFormats.RSS]
+mediaType = "application/rss+xml"
+baseName = "index"
+isPlainText = false
+rel = "alternate"
+isHTML = false
+
+# JSON 搜尋索引格式
+[outputFormats.SearchIndex]
+mediaType = "application/json"
+baseName = "search"
+isPlainText = true
+notAlternative = true
+
+# JSON Feed 格式
+[outputFormats.JSONFeed]
+mediaType = "application/json"
+baseName = "feed"
+isPlainText = true
+rel = "alternate"
+
+# WebApp Manifest 格式 (PWA)
+[outputFormats.WebAppManifest]
+mediaType = "application/manifest+json"
+baseName = "manifest"
+isPlainText = true
+notAlternative = true
+
+# Sitemap 格式
+[outputFormats.SitemapIndex]
+mediaType = "application/xml"
+baseName = "sitemap"
+isPlainText = true
+notAlternative = true
+
+# AMP 頁面格式
+[outputFormats.AMP]
+mediaType = "text/html"
+baseName = "amp/index"
+isHTML = true
+permalinkable = true
+rel = "amphtml"

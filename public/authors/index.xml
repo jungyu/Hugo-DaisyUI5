@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Authors on 艾倫 R&amp;D</title>
+    <link>http://localhost:1313/authors/</link>
+    <description>Recent content in Authors on 艾倫 R&amp;D</description>
+    <generator>Hugo</generator>
+    <language>zh-TW</language>
+    <managingEditor>admin@example.com (網站管理員)</managingEditor>
+    <webMaster>admin@example.com (網站管理員)</webMaster>
+    <lastBuildDate>Wed, 15 Jan 2025 10:00:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/authors/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Admin</title>
+      <link>http://localhost:1313/authors/admin/</link>
+      <pubDate>Wed, 15 Jan 2025 10:00:00 +0800</pubDate><author>admin@example.com (網站管理員)</author>
+      <guid>http://localhost:1313/authors/admin/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,40 @@
+  <div class="card-body">
+    <h2 class="card-title">
+      <a href="{{ .RelPermalink }}" class="link link-hover">
+        {{ .Title }}
+      </a>
+    </h2>
+    
+    {{- if .Description }}
+    <p class="text-base-content/70 mb-4">{{ .Description }}</p>
+    {{- else if .Summary }}
+    <p class="text-base-content/70 mb-4">{{ .Summary | truncate 150 }}</p>
+    {{- end }}
+    
+    <div class="flex items-center justify-between text-sm text-base-content/60 mb-4">
+      {{- if .Date }}
+      <time datetime="{{ .Date.Format "2006-01-02" }}">
+        {{ .Date.Format "2006年1月2日" }}
+      </time>
+      {{- end }}
+      
+      {{- if .ReadingTime }}
+      <span>{{ .ReadingTime }} 分鐘閱讀</span>
+      {{- end }}
+    </div>
+    
+    {{- if .Params.tags }}
+    <div class="flex flex-wrap gap-1 mb-4">
+      {{- range first 3 .Params.tags }}
+      <span class="badge badge-sm badge-ghost">{{ . }}</span>
+      {{- end }}
+    </div>
+    {{- end }}
+    
+    <div class="card-actions justify-end">
+      <a href="{{ .RelPermalink }}" class="btn btn-primary btn-sm">
+        {{ i18n "post.read_more" | default "閱讀更多" }}
+      </a>
+    </div>
+  </div>
+</div>

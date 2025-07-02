@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>艾倫 R&amp;D</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on 艾倫 R&amp;D</description>
+    <generator>Hugo</generator>
+    <language>zh-TW</language>
+    <managingEditor>admin@example.com (網站管理員)</managingEditor>
+    <webMaster>admin@example.com (網站管理員)</webMaster>
+    <lastBuildDate>Wed, 15 Jan 2025 10:00:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>歡迎來到我的第一篇文章</title>
+      <link>http://localhost:1313/blogs/2025/%E6%AD%A1%E8%BF%8E%E4%BE%86%E5%88%B0%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/</link>
+      <pubDate>Wed, 15 Jan 2025 10:00:00 +0800</pubDate><author>admin@example.com (網站管理員)</author>
+      <guid>http://localhost:1313/blogs/2025/%E6%AD%A1%E8%BF%8E%E4%BE%86%E5%88%B0%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/</guid>
+      <description>&lt;p&gt;歡迎來到我們的第一篇文章！這篇文章將帶您了解如何使用 Hugo、TailwindCSS 與 DaisyUI 5 創建現代化的靜態網站。&lt;/p&gt;&#xA;&lt;h2 id=&#34;為什麼選擇這個技術棧&#34;&gt;為什麼選擇這個技術棧？&lt;/h2&gt;&#xA;&lt;h3 id=&#34;hugo---世界上最快的靜態網站產生器&#34;&gt;Hugo - 世界上最快的靜態網站產生器&lt;/h3&gt;&#xA;&lt;p&gt;Hugo 是一個用 Go 語言寫成的靜態網站產生器，具有以下優勢：&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>關於我們</title>
+      <link>http://localhost:1313/about/</link>
+      <pubDate>Wed, 15 Jan 2025 00:00:00 +0000</pubDate><author>admin@example.com (網站管理員)</author>
+      <guid>http://localhost:1313/about/</guid>
+      <description>&lt;p&gt;歡迎來到基於 Hugo、TailwindCSS 與 DaisyUI 5 構建的現代化靜態網站主題！&lt;/p&gt;&#xA;&lt;h2 id=&#34;技術棧&#34;&gt;技術棧&lt;/h2&gt;&#xA;&lt;p&gt;我們的網站採用最新的技術棧：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Hugo v0.147.9&lt;/strong&gt; - 快速的靜態網站產生器&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;TailwindCSS v4.1.11&lt;/strong&gt; - 實用優先的 CSS 框架&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;DaisyUI v5.0.43&lt;/strong&gt; - 基於 TailwindCSS 的組件庫&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Alpine.js v3.14.9&lt;/strong&gt; - 輕量級 JavaScript 框架&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;特色功能&#34;&gt;特色功能&lt;/h2&gt;&#xA;&lt;h3 id=&#34;-現代化設計&#34;&gt;🎨 現代化設計&lt;/h3&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;響應式設計，支援各種螢幕尺寸&lt;/li&gt;&#xA;&lt;li&gt;暗色模式支援&lt;/li&gt;&#xA;&lt;li&gt;優雅的動畫效果&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;-高效能&#34;&gt;⚡ 高效能&lt;/h3&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;靜態網站生成，載入速度極快&lt;/li&gt;&#xA;&lt;li&gt;程式碼分割與懶載入&lt;/li&gt;&#xA;&lt;li&gt;圖片最佳化處理&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;-多語系支援&#34;&gt;🌍 多語系支援&lt;/h3&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;完整的國際化框架&lt;/li&gt;&#xA;&lt;li&gt;支援繁體中文與英文&lt;/li&gt;&#xA;&lt;li&gt;易於擴展其他語言&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;-seo-友善&#34;&gt;🔍 SEO 友善&lt;/h3&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;語義化 HTML 結構&lt;/li&gt;&#xA;&lt;li&gt;Open Graph 與 Twitter Cards 支援&lt;/li&gt;&#xA;&lt;li&gt;結構化資料標記&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;聯絡方式&#34;&gt;聯絡方式&lt;/h2&gt;&#xA;&lt;p&gt;如果您有任何問題或建議，歡迎透過以下方式聯絡我們：&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

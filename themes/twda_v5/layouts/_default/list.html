@@ -1,0 +1,36 @@
+{{- define "main" }}
+<div class="container mx-auto px-4 py-8">
+  <header class="mb-8">
+    <h1 class="text-4xl font-bold text-center">{{ .Title }}</h1>
+    {{- if .Description }}
+    <p class="text-xl text-center text-base-content/70 mt-4">{{ .Description }}</p>
+    {{- end }}
+  </header>
+  
+  {{- if .Content }}
+  <div class="prose max-w-none mb-12">
+    {{ .Content }}
+  </div>
+  {{- end }}
+  
+  {{- $paginator := .Paginate .Pages }}
+  {{- if gt $paginator.TotalPages 0 }}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    {{- range $paginator.Pages }}
+    {{- partial "components/post-card.html" . }}
+    {{- end }}
+  </div>
+  
+  {{- if gt $paginator.TotalPages 1 }}
+  {{- partial "components/pagination.html" $paginator }}
+  {{- end }}
+  
+  {{- else }}
+  <div class="text-center py-12">
+    <div class="text-6xl mb-4">📝</div>
+    <h3 class="text-2xl font-semibold mb-2">暫無內容</h3>
+    <p class="text-base-content/70">這個分類目前還沒有任何文章。</p>
+  </div>
+  {{- end }}
+</div>
+{{- end }}

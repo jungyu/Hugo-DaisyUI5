@@ -1,0 +1,86 @@
+baseURL = 'https://localhost:1313'
+languageCode = 'zh-TW'
+defaultContentLanguage = 'zh-tw'
+title = '艾倫 R&D'
+theme = 'twda_v5'
+
+# Hugo 基本設定
+configDir = "config"
+contentDir = "content"
+dataDir = "data"
+layoutDir = "layouts"
+publishDir = 'public'
+staticDir = "static"
+
+# 內容設定
+enableRobotsTXT = true
+enableGitInfo = true
+hasCJKLanguage = true
+
+# 構建設定
+buildDrafts = false
+buildFuture = false
+buildExpired = false
+
+# 安全設定
+disablePathToLower = false
+removePathAccents = false
+
+# 輸出格式
+[outputs]
+  home = ['HTML', 'RSS', 'JSON']
+  page = ['HTML']
+  section = ['HTML', 'RSS']
+  taxonomy = ['HTML', 'RSS']
+  term = ['HTML', 'RSS']
+
+# 分類法 (符合專案規格)
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+  series = "series"
+  author = "authors"
+
+# 永久鏈接 (符合專案規格: /blogs/:sections[1]/:year/:slug/)
+[permalinks]
+  blogs = "/blogs/:sections[1]/:year/:slug/"
+  posts = "/blogs/:sections[1]/:year/:slug/"
+
+# 分頁設定 (Hugo v0.128.0+ 新格式)
+[pagination]
+pagerSize = 9
+path = "page"
+
+# 相關內容
+[related]
+  threshold = 80
+  includeNewer = true
+  toLower = false
+  [[related.indices]]
+    name = "keywords"
+    weight = 100
+  [[related.indices]]
+    name = "tags"
+    weight = 80
+  [[related.indices]]
+    name = "categories"
+    weight = 60
+  [[related.indices]]
+    name = "date"
+    weight = 10
+
+# 服務設定
+[services]
+  [services.googleAnalytics]
+    ID = ""
+  [services.disqus]
+    shortname = ""
+
+# 隱私設定
+[privacy]
+  [privacy.googleAnalytics]
+    anonymizeIP = true
+    respectDoNotTrack = true
+    useSessionStorage = true
+  [privacy.youtube]
+    privacyEnhanced = true
