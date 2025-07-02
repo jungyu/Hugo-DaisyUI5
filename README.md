@@ -28,6 +28,8 @@ Prompts/
 ├── Build-Prompts-2-1.md    # 進階建構指南 (階段 5-7) ✅ 已修正 Alpine.js
 ├── Build-Prompts-2-1-add.md # 第二部分補充指南 (額外操作)
 ├── Build-Prompts-2-1-theme-fix.md # Alpine.js 主題切換修正記錄 🆕
+├── Build-Prompts-2-2.md    # DaisyUI 5 + TailwindCSS v4 整合指南
+├── Build-Prompts-2-2-add.md # DaisyUI 5 配置完成記錄 ✅ 2025-07-02
 ├── Theme-Toggle-Fix.md     # 主題切換功能修正指南 🔧
 ├── Build-Prompts-2.md      # 進階功能建構
 ├── Build-Prompts-3.md      # 部署與優化指南
@@ -54,7 +56,14 @@ Prompts/
 - 📋 **修正指南**: [`Theme-Toggle-Fix.md`](./Prompts/Theme-Toggle-Fix.md)
 - 📝 **修正記錄**: [`Build-Prompts-2-1-theme-fix.md`](./Prompts/Build-Prompts-2-1-theme-fix.md)
 
-### 6. 了解技術規格
+### 6. DaisyUI 5 + TailwindCSS v4 整合 ✅
+
+**最新完成 (2025年7月2日)**: DaisyUI 5 與 TailwindCSS v4 完整整合已完成，包含主題系統、組件庫、響應式設計等。
+
+- 📋 **整合指南**: [`Build-Prompts-2-2.md`](./Prompts/Build-Prompts-2-2.md)
+- 📝 **完成記錄**: [`Build-Prompts-2-2-add.md`](./Prompts/Build-Prompts-2-2-add.md)
+
+### 7. 了解技術規格
 參考 [`Project-Config.md`](./建構參照/Project-Config.md) 了解詳細的技術配置。
 
 ### 7. 理解專案結構
