@@ -346,14 +346,14 @@ version = "5.0.0"
     [diagrams.mermaid.gantt]
       useMaxWidth = true
 
-# Alpine.js 功能模組
+# Alpine.js 功能模組 (重要：避免使用 persist 插件)
 [alpinejs]
   enabled = true
   version = "3.14.9"
-  plugins = ["intersect", "persist"]
-  [alpinejs.persist]
-    storage = "localStorage"
-    prefix = "alpine"
+  plugins = ["intersect"]  # 移除 "persist" 避免 Alpine.$persist 錯誤
+  [alpinejs.intersect]
+    enabled = true
+  # 注意：不使用 persist 插件，改用 localStorage 手動管理狀態
 
 # 字體配置
 [fonts]
@@ -539,7 +539,7 @@ EOF
 - Fuse.js 搜尋引擎: 支援中文搜尋與權重配置
 - KaTeX 數學公式: 完整渲染設定與錯誤處理
 - Mermaid 圖表: 多主題支援與響應式設計
-- Alpine.js 插件: intersect, persist 整合
+- Alpine.js 插件: 僅使用 intersect 插件，移除 persist 避免兼容性問題
 
 進階功能：
 - SEO 最佳化: OpenGraph, Twitter Cards, 結構化資料
@@ -1097,10 +1097,791 @@ EOF
 
 ## 階段七：Alpine.js v3.14.9 功能模組
 
+> **重要修正**: 依據 Theme-Toggle-Fix.md，避免使用 Alpine.$persist，改用 localStorage 手動管理狀態持久化
+
 ### 7.1 核心 JavaScript 架構
 
-（請將 Build-Prompts-2.md 中「3. Alpine.js」相關段落補上，若有 CLI 指令、配置、說明、AI Prompt 一併納入）
+**CLI 指令:**
+
+```bash
+# 建立 Alpine.js 核心功能模組 (使用 localStorage 避免 $persist 問題)
+cat > themes/twda_v5/assets/js/alpine.js << 'EOF'
+// Alpine.js v3.14.9 核心功能模組
+// 修正版: 使用 localStorage 替代 Alpine.$persist
+
+// 主題切換系統 (修正版)
+Alpine.store('theme', {
+  current: localStorage.getItem('theme') || 'dracula',
+  
+  init() {
+    this.apply()
+    
+    // 監聽系統主題變化
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (this.current === 'system') {
+          this.apply()
+        }
+      })
+    }
+  },
+  
+  apply() {
+    document.documentElement.setAttribute('data-theme', this.current)
+    localStorage.setItem('theme', this.current) // 手動保存到 localStorage
+    
+    // 設置 dark class 用於 Tailwind dark mode
+    if (this.current === 'dracula') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+    
+    // 更新 Mermaid 主題
+    if (window.mermaid) {
+      window.mermaid.initialize({
+        theme: this.current === 'dracula' ? 'dark' : 'default'
+      })
+    }
+  },
+  
+  setTheme(theme) {
+    this.current = theme
+    this.apply()
+  },
+  
+  toggle() {
+    this.current = this.current === 'dracula' ? 'cmyk' : 'dracula'
+    this.apply()
+  }
+})
+
+// 導航系統
+Alpine.data('navigation', () => ({
+  isOpen: false,
+  isMobile: window.innerWidth < 768,
+  
+  init() {
+    this.checkMobile()
+    window.addEventListener('resize', () => this.checkMobile())
+    
+    // 點擊外部關閉選單
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('[x-data*="navigation"]')) {
+        this.close()
+      }
+    })
+  },
+  
+  toggle() {
+    this.isOpen = !this.isOpen
+    
+    if (this.isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  },
+  
+  open() {
+    this.isOpen = true
+    document.body.style.overflow = 'hidden'
+  },
+  
+  close() {
+    this.isOpen = false
+    document.body.style.overflow = ''
+  },
+  
+  checkMobile() {
+    this.isMobile = window.innerWidth < 768
+    if (!this.isMobile) {
+      this.close()
+    }
+  }
+}))
+
+// 搜尋系統 (Fuse.js 整合)
+Alpine.data('search', () => ({
+  isOpen: false,
+  query: localStorage.getItem('searchQuery') || '',
+  results: [],
+  loading: false,
+  searchIndex: null,
+  fuse: null,
+  
+  async init() {
+    // 載入搜尋索引
+    await this.loadSearchIndex()
+    
+    // 鍵盤快捷鍵
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        this.open()
+      }
+      
+      if (e.key === 'Escape' && this.isOpen) {
+        this.close()
+      }
+    })
+  },
+  
+  async loadSearchIndex() {
+    try {
+      const response = await fetch('/search.json')
+      this.searchIndex = await response.json()
+      
+      // 初始化 Fuse.js (需要在 HTML 中引入)
+      if (window.Fuse) {
+        this.fuse = new Fuse(this.searchIndex, {
+          keys: [
+            { name: 'title', weight: 2.0 },
+            { name: 'content', weight: 1.0 },
+            { name: 'tags', weight: 1.5 },
+            { name: 'categories', weight: 1.5 }
+          ],
+          threshold: 0.3,
+          distance: 100,
+          minMatchCharLength: 2
+        })
+      }
+    } catch (error) {
+      console.error('載入搜尋索引失敗:', error)
+    }
+  },
+  
+  open() {
+    this.isOpen = true
+    this.$nextTick(() => {
+      this.$refs.searchInput?.focus()
+    })
+  },
+  
+  close() {
+    this.isOpen = false
+    this.query = ''
+    this.results = []
+  },
+  
+  async search() {
+    if (this.query.length < 2) {
+      this.results = []
+      return
+    }
+    
+    this.loading = true
+    localStorage.setItem('searchQuery', this.query) // 手動保存搜尋查詢
+    
+    try {
+      if (this.fuse) {
+        // 使用 Fuse.js 進行模糊搜尋
+        const searchResults = this.fuse.search(this.query)
+        this.results = searchResults.slice(0, 10).map(result => result.item)
+      } else {
+        // 備用簡單搜尋
+        this.results = this.searchIndex.filter(item => 
+          item.title.toLowerCase().includes(this.query.toLowerCase()) ||
+          item.content.toLowerCase().includes(this.query.toLowerCase())
+        ).slice(0, 10)
+      }
+    } catch (error) {
+      console.error('搜尋錯誤:', error)
+      this.results = []
+    } finally {
+      this.loading = false
+    }
+  },
+  
+  goToResult(url) {
+    window.location.href = url
+    this.close()
+  }
+}))
+
+// 滾動追蹤與回到頂部
+Alpine.data('scrollTracker', () => ({
+  scrollY: 0,
+  progress: 0,
+  isVisible: false,
+  
+  init() {
+    this.updateScroll()
+    window.addEventListener('scroll', () => this.updateScroll())
+  },
+  
+  updateScroll() {
+    this.scrollY = window.scrollY
+    this.isVisible = this.scrollY > 300
+    
+    // 計算閱讀進度
+    const article = document.querySelector('article') || document.querySelector('main')
+    if (article) {
+      const articleTop = article.offsetTop
+      const articleHeight = article.offsetHeight
+      const windowHeight = window.innerHeight
+      
+      const start = articleTop - windowHeight / 2
+      const end = articleTop + articleHeight - windowHeight / 2
+      
+      if (this.scrollY < start) {
+        this.progress = 0
+      } else if (this.scrollY > end) {
+        this.progress = 100
+      } else {
+        this.progress = Math.round(((this.scrollY - start) / (end - start)) * 100)
+      }
+    }
+  },
+  
+  scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
+}))
+
+// 目錄 (TOC) 系統
+Alpine.data('tableOfContents', () => ({
+  activeId: '',
+  headings: [],
+  isOpen: false,
+  
+  init() {
+    this.collectHeadings()
+    this.setupIntersectionObserver()
+  },
+  
+  collectHeadings() {
+    this.headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
+      .filter(heading => heading.id)
+      .map(heading => ({
+        id: heading.id,
+        text: heading.textContent,
+        level: parseInt(heading.tagName.charAt(1))
+      }))
+  },
+  
+  setupIntersectionObserver() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          this.activeId = entry.target.id
+        }
+      })
+    }, {
+      rootMargin: '-20% 0% -80% 0%'
+    })
+    
+    this.headings.forEach(heading => {
+      const element = document.getElementById(heading.id)
+      if (element) {
+        observer.observe(element)
+      }
+    })
+  },
+  
+  scrollToHeading(id) {
+    const element = document.getElementById(id)
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
+    this.isOpen = false
+  },
+  
+  toggle() {
+    this.isOpen = !this.isOpen
+  }
+}))
+
+// 初始化主題系統
+document.addEventListener('alpine:init', () => {
+  Alpine.store('theme').init()
+})
+
+console.log('Alpine.js v3.14.9 核心功能模組載入完成 (localStorage 版本)')
+EOF
+
+# 建立進階互動功能模組
+cat > themes/twda_v5/assets/js/alpine-interactions.js << 'EOF'
+// Alpine.js 互動功能模組
+// 進階用戶體驗功能
+
+// 分享功能模組
+Alpine.data('shareSystem', () => ({
+  platforms: {
+    twitter: {
+      name: 'Twitter',
+      icon: 'twitter',
+      url: 'https://twitter.com/intent/tweet?text={title}&url={url}'
+    },
+    facebook: {
+      name: 'Facebook',
+      icon: 'facebook',
+      url: 'https://www.facebook.com/sharer/sharer.php?u={url}'
+    },
+    linkedin: {
+      name: 'LinkedIn',
+      icon: 'linkedin',
+      url: 'https://www.linkedin.com/sharing/share-offsite/?url={url}'
+    },
+    telegram: {
+      name: 'Telegram',
+      icon: 'telegram',
+      url: 'https://t.me/share/url?url={url}&text={title}'
+    }
+  },
+  
+  share(platform) {
+    const title = encodeURIComponent(document.title)
+    const url = encodeURIComponent(window.location.href)
+    
+    const shareUrl = this.platforms[platform].url
+      .replace('{title}', title)
+      .replace('{url}', url)
+    
+    window.open(shareUrl, '_blank', 'width=600,height=400')
+  },
+  
+  async copyLink() {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      
+      // 顯示複製成功提示
+      this.$dispatch('toast', {
+        type: 'success',
+        message: '連結已複製到剪貼板'
+      })
+    } catch (error) {
+      console.error('複製連結失敗:', error)
+    }
+  },
+  
+  async nativeShare() {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: document.title,
+          url: window.location.href
+        })
+      } catch (error) {
+        console.error('原生分享失敗:', error)
+      }
+    }
+  }
+}))
+
+// Toast 通知系統
+Alpine.data('toastSystem', () => ({
+  toasts: [],
+  
+  init() {
+    // 監聽 toast 事件
+    window.addEventListener('toast', (e) => {
+      this.show(e.detail)
+    })
+  },
+  
+  show(options) {
+    const toast = {
+      id: Date.now(),
+      type: options.type || 'info',
+      message: options.message || '',
+      duration: options.duration || 3000,
+      autoRemove: options.autoRemove !== false
+    }
+    
+    this.toasts.push(toast)
+    
+    if (toast.autoRemove) {
+      setTimeout(() => {
+        this.removeById(toast.id)
+      }, toast.duration)
+    }
+  },
+  
+  remove(index) {
+    this.toasts.splice(index, 1)
+  },
+  
+  removeById(id) {
+    const index = this.toasts.findIndex(toast => toast.id === id)
+    if (index > -1) {
+      this.remove(index)
+    }
+  },
+  
+  clear() {
+    this.toasts = []
+  }
+}))
+
+// 程式碼區塊功能
+Alpine.data('codeBlock', () => ({
+  copied: false,
+  language: 'text',
+  
+  init() {
+    // 檢測程式語言
+    const codeElement = this.$el.querySelector('code')
+    if (codeElement) {
+      const classes = codeElement.className.split(' ')
+      const langClass = classes.find(cls => cls.startsWith('language-'))
+      if (langClass) {
+        this.language = langClass.replace('language-', '')
+      }
+    }
+  },
+  
+  async copy() {
+    const codeElement = this.$el.querySelector('code')
+    if (!codeElement) return
+    
+    try {
+      await navigator.clipboard.writeText(codeElement.textContent)
+      this.copied = true
+      
+      setTimeout(() => {
+        this.copied = false
+      }, 2000)
+    } catch (error) {
+      console.error('複製失敗:', error)
+    }
+  }
+}))
+
+console.log('Alpine.js 互動功能模組載入完成')
+EOF
+
+# 建立狀態管理模組 (使用 localStorage 替代 Alpine.$persist)
+cat > themes/twda_v5/assets/js/alpine-state.js << 'EOF'
+// Alpine.js 狀態管理模組
+// 使用 localStorage 手動管理持久化狀態
+
+// 全域狀態管理器
+Alpine.store('app', {
+  // 應用狀態
+  initialized: false,
+  version: '5.0.0',
+  
+  // 用戶偏好設定 (手動 localStorage 管理)
+  preferences: JSON.parse(localStorage.getItem('user-preferences') || JSON.stringify({
+    theme: 'dracula',
+    language: 'zh-tw',
+    fontSize: 'medium',
+    reduceMotion: false,
+    highContrast: false,
+    compactMode: false
+  })),
+  
+  // 功能開關
+  features: {
+    search: true,
+    comments: true,
+    analytics: false,
+    darkMode: true,
+    shareButtons: true,
+    backToTop: true,
+    readingProgress: true,
+    tableOfContents: true
+  },
+  
+  // 統計數據 (手動 localStorage 管理)
+  stats: JSON.parse(localStorage.getItem('user-stats') || JSON.stringify({
+    visits: 0,
+    pageViews: 0,
+    timeSpent: 0,
+    lastVisit: null
+  })),
+  
+  // 初始化
+  init() {
+    if (this.initialized) return
+    
+    this.updateStats()
+    this.applyPreferences()
+    this.initialized = true
+    
+    console.log('全域狀態管理器已初始化')
+  },
+  
+  // 更新統計
+  updateStats() {
+    this.stats.visits++
+    this.stats.pageViews++
+    this.stats.lastVisit = new Date().toISOString()
+    localStorage.setItem('user-stats', JSON.stringify(this.stats))
+  },
+  
+  // 應用用戶偏好設定
+  applyPreferences() {
+    document.documentElement.setAttribute('data-theme', this.preferences.theme)
+    document.documentElement.setAttribute('data-font-size', this.preferences.fontSize)
+    
+    if (this.preferences.reduceMotion) {
+      document.documentElement.style.setProperty('--animation-duration', '0s')
+    }
+    
+    if (this.preferences.highContrast) {
+      document.documentElement.classList.add('high-contrast')
+    }
+    
+    if (this.preferences.compactMode) {
+      document.documentElement.classList.add('compact-mode')
+    }
+  },
+  
+  // 設定主題
+  setTheme(theme) {
+    this.preferences.theme = theme
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('user-preferences', JSON.stringify(this.preferences))
+  },
+  
+  // 設定語言
+  setLanguage(language) {
+    this.preferences.language = language
+    localStorage.setItem('user-preferences', JSON.stringify(this.preferences))
+    
+    // 觸發語言變更事件
+    window.dispatchEvent(new CustomEvent('languageChanged', {
+      detail: { language }
+    }))
+  },
+  
+  // 設定字體大小
+  setFontSize(size) {
+    this.preferences.fontSize = size
+    document.documentElement.setAttribute('data-font-size', size)
+    localStorage.setItem('user-preferences', JSON.stringify(this.preferences))
+  },
+  
+  // 切換功能
+  toggleFeature(feature) {
+    this.features[feature] = !this.features[feature]
+  },
+  
+  // 重置偏好設定
+  resetPreferences() {
+    this.preferences = {
+      theme: 'dracula',
+      language: 'zh-tw',
+      fontSize: 'medium',
+      reduceMotion: false,
+      highContrast: false,
+      compactMode: false
+    }
+    localStorage.setItem('user-preferences', JSON.stringify(this.preferences))
+    this.applyPreferences()
+  }
+})
+
+// 收藏/書籤系統 (手動 localStorage 管理)
+Alpine.data('bookmarkSystem', () => ({
+  bookmarks: JSON.parse(localStorage.getItem('bookmarks') || '[]'),
+  
+  isBookmarked(url) {
+    return this.bookmarks.some(bookmark => bookmark.url === url)
+  },
+  
+  toggle(url = window.location.href, title = document.title) {
+    if (this.isBookmarked(url)) {
+      this.remove(url)
+    } else {
+      this.add(url, title)
+    }
+  },
+  
+  add(url, title) {
+    if (this.isBookmarked(url)) return
+    
+    this.bookmarks.push({
+      url,
+      title,
+      addedAt: new Date().toISOString()
+    })
+    
+    localStorage.setItem('bookmarks', JSON.stringify(this.bookmarks))
+    
+    // 觸發通知
+    window.dispatchEvent(new CustomEvent('toast', {
+      detail: {
+        type: 'success',
+        message: '已加入書籤'
+      }
+    }))
+  },
+  
+  remove(url) {
+    const index = this.bookmarks.findIndex(bookmark => bookmark.url === url)
+    if (index > -1) {
+      this.bookmarks.splice(index, 1)
+      localStorage.setItem('bookmarks', JSON.stringify(this.bookmarks))
+      
+      // 觸發通知
+      window.dispatchEvent(new CustomEvent('toast', {
+        detail: {
+          type: 'info',
+          message: '已移除書籤'
+        }
+      }))
+    }
+  },
+  
+  clear() {
+    if (confirm('確定要清空所有書籤嗎？')) {
+      this.bookmarks = []
+      localStorage.setItem('bookmarks', JSON.stringify(this.bookmarks))
+    }
+  }
+}))
+
+// 閱讀歷史系統 (手動 localStorage 管理)
+Alpine.data('readingHistory', () => ({
+  history: JSON.parse(localStorage.getItem('reading-history') || '[]'),
+  maxItems: 100,
+  
+  addToHistory(url = window.location.href, title = document.title) {
+    // 移除已存在的記錄
+    this.history = this.history.filter(item => item.url !== url)
+    
+    // 添加到開頭
+    this.history.unshift({
+      url,
+      title,
+      readAt: new Date().toISOString()
+    })
+    
+    // 限制數量
+    if (this.history.length > this.maxItems) {
+      this.history = this.history.slice(0, this.maxItems)
+    }
+    
+    localStorage.setItem('reading-history', JSON.stringify(this.history))
+  },
+  
+  getRecent(count = 10) {
+    return this.history.slice(0, count)
+  },
+  
+  clear() {
+    if (confirm('確定要清空閱讀歷史嗎？')) {
+      this.history = []
+      localStorage.setItem('reading-history', JSON.stringify(this.history))
+    }
+  },
+  
+  remove(url) {
+    this.history = this.history.filter(item => item.url !== url)
+    localStorage.setItem('reading-history', JSON.stringify(this.history))
+  }
+}))
+
+// 初始化全域狀態
+document.addEventListener('DOMContentLoaded', () => {
+  Alpine.store('app').init()
+  
+  console.log('狀態管理與持久化模組載入完成 (localStorage 版本)')
+})
+EOF
+
+# 更新 baseof.html 以載入新的 JavaScript 模組
+cat > themes/twda_v5/layouts/_default/baseof.html << 'EOF'
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang }}" data-theme="{{ .Site.Params.theme.default | default "dracula" }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    {{- if .IsHome }}{{ .Site.Title }}
+    {{- else }}{{ .Title }} - {{ .Site.Title }}{{ end -}}
+  </title>
+  
+  <!-- CSS -->
+  {{ $css := resources.Get "css/app.css" | css.PostCSS | resources.Minify }}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}">
+  
+  <!-- 預載主題避免閃爍 -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dracula';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body>
+  {{ partial "header.html" . }}
+  
+  <main>
+    {{ block "main" . }}{{ end }}
+  </main>
+  
+  {{ partial "footer.html" . }}
+  
+  <!-- Alpine.js 核心 -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+  
+  <!-- 載入自定義 Alpine.js 模組 -->
+  {{ $alpine := resources.Get "js/alpine.js" }}
+  {{ $interactions := resources.Get "js/alpine-interactions.js" }}
+  {{ $state := resources.Get "js/alpine-state.js" }}
+  
+  {{ if $alpine }}
+    {{ $js := slice $alpine $interactions $state | resources.Concat "js/bundle.js" | resources.Minify }}
+    <script src="{{ $js.RelPermalink }}"></script>
+  {{ end }}
+</body>
+</html>
+EOF
+```
+
+### 7.2 互動功能模組
+
+前述指令中已包含 `alpine-interactions.js` 檔案，提供以下功能：
+
+- **分享系統**: 社交媒體分享、連結複製、原生分享 API
+- **Toast 通知**: 成功、錯誤、資訊通知
+- **程式碼區塊**: 一鍵複製、語言偵測
+
+### 7.3 狀態管理與持久化
+
+> **關鍵修正**: 完全移除 Alpine.$persist 依賴，改用 localStorage 手動管理
+
+**重要特性**:
+
+- ✅ **主題持久化**: 使用 `localStorage.setItem('theme', value)`
+- ✅ **搜尋記錄**: 手動保存搜尋查詢到 localStorage
+- ✅ **用戶偏好**: JSON 序列化保存到 localStorage
+- ✅ **書籤系統**: 完整的 CRUD 操作與持久化
+- ✅ **閱讀歷史**: 自動記錄與清理機制
+
+**狀態管理架構**:
+
+```javascript
+// 正確的持久化寫法
+preferences: JSON.parse(localStorage.getItem('user-preferences') || '{}')
+
+// 更新時手動保存
+setTheme(theme) {
+  this.preferences.theme = theme
+  localStorage.setItem('user-preferences', JSON.stringify(this.preferences))
+}
+```
 
 ---
 
-（如需補充 7.2 互動功能模組、7.3 狀態管理與持久化，請依 Build-Prompts-2.md 原文結構補全）
+**AI Prompt 建議**:
+
+```text
+請依據以上 Alpine.js 模組化架構，為我的 Hugo 網站添加 [具體功能]。
+請確保：
+1. 使用 localStorage 而非 Alpine.$persist
+2. 包含適當的錯誤處理
+3. 支援鍵盤快捷鍵
+4. 提供無障礙功能
+5. 與 DaisyUI 主題系統整合
+```
