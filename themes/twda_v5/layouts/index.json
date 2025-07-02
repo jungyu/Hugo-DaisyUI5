@@ -1,0 +1,20 @@
+{
+  "site": {
+    "title": {{ .Site.Title | jsonify }},
+    "description": {{ .Site.Params.description | default "" | jsonify }},
+    "url": {{ .Site.BaseURL | jsonify }},
+    "language": {{ .Site.LanguageCode | jsonify }}
+  },
+  "pages": [
+    {{- $pages := where .Site.RegularPages "Type" "ne" "page" -}}
+    {{- range $index, $page := $pages -}}
+      {{- if $index }},{{ end }}
+      {
+        "title": {{ $page.Title | jsonify }},
+        "url": {{ $page.Permalink | jsonify }},
+        "date": {{ $page.Date.Format "2006-01-02" | jsonify }},
+        "summary": {{ $page.Summary | jsonify }}
+      }
+    {{- end -}}
+  ]
+}
