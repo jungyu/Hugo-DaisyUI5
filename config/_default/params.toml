@@ -1,108 +1,180 @@
-# TWDA v5 主題參數配置
-# 基於 Hugo v0.147.9 + TailwindCSS v4.1.11 + DaisyUI v5.0.43
-
 # 網站基本資訊
-title = "Hugo + DaisyUI 5 網站"
-description = "基於 Hugo、TailwindCSS 與 DaisyUI 5 構建的現代化靜態網站"
-keywords = ["Hugo", "TailwindCSS", "DaisyUI", "靜態網站", "部落格"]
+description = '艾倫 R&D - 基於 Hugo + TailwindCSS v4.1.11 + DaisyUI v5.0.43 的現代化網站'
+author = '艾倫'
+subtitle = '技術研發與分享'
+keywords = ['Hugo', 'TailwindCSS', 'DaisyUI', 'Alpine.js', '前端開發', '技術分享']
+version = "5.0.0"
 
-# 主題設定
-theme = "dracula"  # DaisyUI 預設主題
-logo = "/images/logo.svg"
-favicon = "/icons/favicon.ico"
+# 網站元數據
+[site]
+  logo = "/images/logo.svg"
+  favicon = "/favicon.ico"
+  appleTouchIcon = "/images/apple-touch-icon.png"
 
-# 作者資訊
-[author]
-name = "網站管理員"
-email = "admin@example.com"
-bio = "熱愛技術的開發者"
-avatar = "/images/avatar.jpg"
+# DaisyUI 主題配置 (符合專案規格)
+[theme]
+  default = "dracula"
+  light = "cmyk"
+  dark = "dracula"
+  enableToggle = true
+  enableSystem = true
+  storage = "localStorage"
 
-# 社群連結
+# 搜尋功能 (Fuse.js 配置)
+[search]
+  enabled = true
+  provider = "fuse"
+  placeholder = "搜尋文章、分類、標籤..."
+  maxResults = 10
+  [search.fuse]
+    threshold = 0.3
+    distance = 100
+    location = 0
+    minMatchCharLength = 2
+    keys = [
+      { name = "title", weight = 2.0 },
+      { name = "content", weight = 1.0 },
+      { name = "tags", weight = 1.5 },
+      { name = "categories", weight = 1.5 },
+      { name = "description", weight = 1.2 }
+    ]
+
+# 數學公式 (KaTeX 配置)
+[math]
+  enabled = true
+  provider = "katex"
+  version = "0.16.20"
+  [math.katex]
+    inlineLeftDelimiter = "\\\\("
+    inlineRightDelimiter = "\\\\)"
+    blockLeftDelimiter = "$$"
+    blockRightDelimiter = "$$"
+    throwOnError = false
+    errorColor = "#cc0000"
+    strict = "warn"
+    trust = false
+    macros = {}
+
+# 圖表功能 (Mermaid 配置)
+[diagrams]
+  enabled = true
+  provider = "mermaid"
+  version = "11.4.1"
+  [diagrams.mermaid]
+    theme = "default"
+    darkTheme = "dark"
+    fontFamily = "Inter, system-ui, sans-serif"
+    [diagrams.mermaid.flowchart]
+      useMaxWidth = true
+      htmlLabels = true
+    [diagrams.mermaid.sequence]
+      useMaxWidth = true
+      wrap = true
+    [diagrams.mermaid.gantt]
+      useMaxWidth = true
+
+# Alpine.js 功能模組
+[alpinejs]
+  enabled = true
+  version = "3.14.9"
+  plugins = ["intersect", "persist"]
+  [alpinejs.persist]
+    storage = "localStorage"
+    prefix = "alpine"
+
+# 字體配置
+[fonts]
+  enableCustom = true
+  sizeAdjustment = true
+  [fonts.families]
+    sans = ["Inter", "Noto Sans TC", "system-ui", "sans-serif"]
+    mono = ["JetBrains Mono", "Cascadia Code", "Noto Sans Mono CJK TC", "monospace"]
+  [fonts.sizes]
+    small = "text-sm"
+    medium = "text-base"
+    large = "text-lg"
+    xl = "text-xl"
+
+# 社交連結 (使用物件格式，非陣列)
 [social]
-github = "https://github.com/yourusername"
-twitter = "https://twitter.com/yourusername"
-linkedin = "https://linkedin.com/in/yourusername"
-facebook = "https://facebook.com/yourusername"
+  github = "https://github.com/username"
+  twitter = "https://twitter.com/username"
+  linkedin = "https://linkedin.com/in/username"
+  rss = "/index.xml"
 
-# 功能開關
-[features]
-search = true
-comments = true
-toc = true
-reading_time = true
-post_navigation = true
-related_posts = true
-share_buttons = true
-dark_mode = true
-
-# 首頁設定
-[homepage]
-hero_title = "歡迎來到 TWDA v5"
-hero_subtitle = "基於 Hugo + TailwindCSS + DaisyUI 的現代化主題"
-hero_cta_text = "開始探索"
-hero_cta_link = "/blogs/"
-featured_posts = true
-posts_per_page = 6
-
-# 部落格設定
-[blog]
-posts_per_page = 10
-enable_summary = true
-summary_length = 150
-enable_tags = true
-enable_categories = true
-enable_authors = true
+# 啟用狀態
+[social.enabled]
+  github = true
+  twitter = true
+  linkedin = true
+  rss = true
 
 # SEO 設定
 [seo]
-meta_title_suffix = " - TWDA v5"
-meta_description_length = 160
-enable_json_ld = true
-enable_open_graph = true
-enable_twitter_cards = true
+  enableStructuredData = true
+  enableOpenGraph = true
+  enableTwitterCard = true
+  twitterCardType = "summary_large_image"
+  [seo.openGraph]
+    siteName = "艾倫 R&D"
+    type = "website"
+    locale = "zh_TW"
+  [seo.twitter]
+    site = "@username"
+    creator = "@username"
 
-# 圖片設定
-[images]
-default_featured = "/images/default-featured.jpg"
-enable_lazy_loading = true
-enable_webp = true
-enable_responsive = true
+# 文章設定
+[posts]
+  showReadingTime = true
+  showWordCount = true
+  showTableOfContents = true
+  showRelatedPosts = true
+  relatedPostsCount = 3
+  showBreadcrumb = true
+  showPagination = true
+  showShareButtons = true
+  showLastModified = true
+  showAuthors = true
+  [posts.comments]
+    enabled = false
+    provider = "giscus"
+  [posts.syntax]
+    lineNumbers = true
+    tabWidth = 2
+    theme = "github"
 
-# 多語系設定
-[i18n]
-default_language = "zh-tw"
-enable_multilingual = false
-
-# 分析工具
-[analytics]
-google_analytics = ""
-gtag = ""
-
-# 留言系統
-[comments]
-provider = "disqus"  # disqus, utterances, giscus
-disqus_shortname = ""
-utterances_repo = ""
-giscus_repo = ""
-
-# 搜尋功能
-[search]
-provider = "fuse"  # fuse, algolia
-enable_search_index = true
-search_placeholder = "搜尋文章..."
-
-# PWA 設定
-[pwa]
-enable = false
-name = "TWDA v5"
-short_name = "TWDA"
-theme_color = "#000000"
-background_color = "#ffffff"
-
-# 性能優化
+# 頁面載入與效能
 [performance]
-enable_minify = true
-enable_fingerprint = true
-enable_gzip = true
-enable_cache_busting = true
+  enableLazyLoading = true
+  enableImageOptimization = true
+  enableMinification = true
+  enableCompression = true
+  [performance.images]
+    defaultFormat = "webp"
+    quality = 85
+    sizes = [480, 768, 1024, 1366, 1920]
+
+# 分析功能 (預備整合)
+[analytics]
+  enabled = false
+  provider = "google"
+  id = ""
+
+# PWA 支援
+[pwa]
+  enabled = true
+  name = "艾倫 R&D"
+  shortName = "AaronRD"
+  description = "技術研發與分享平台"
+  themeColor = "#1f2937"
+  backgroundColor = "#ffffff"
+  display = "standalone"
+  orientation = "portrait"
+
+# 開發設定
+[development]
+  showDrafts = true
+  showFuture = false
+  showExpired = false
+  liveReload = true
+  port = 1313

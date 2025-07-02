@@ -1,29 +1,28 @@
-# 輸出格式配置
-# 為 Hugo 網站定義各種輸出格式
-
-[outputFormats]
-
-# RSS 訂閱格式
+# 自訂輸出格式
 [outputFormats.RSS]
-mediaType = "application/rss+xml"
-baseName = "index"
-isPlainText = false
-rel = "alternate"
-isHTML = false
+  mediaType = "application/rss+xml"
+  baseName = "index"
+  isPlainText = false
+  rel = "alternate"
+  isHTML = false
+  noUgly = true
+  permalinkable = false
 
-# JSON 搜尋索引格式
+[outputFormats.JSON]
+  mediaType = "application/json"
+  baseName = "index"
+  isPlainText = true
+  isHTML = false
+  noUgly = true
+  permalinkable = false
+
 [outputFormats.SearchIndex]
-mediaType = "application/json"
-baseName = "search"
-isPlainText = true
-notAlternative = true
-
-# JSON Feed 格式
-[outputFormats.JSONFeed]
-mediaType = "application/json"
-baseName = "feed"
-isPlainText = true
-rel = "alternate"
+  mediaType = "application/json"
+  baseName = "search"
+  isPlainText = true
+  isHTML = false
+  noUgly = true
+  permalinkable = false
 
 # WebApp Manifest 格式 (PWA)
 [outputFormats.WebAppManifest]

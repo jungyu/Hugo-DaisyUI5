@@ -1,95 +1,72 @@
-# 網站導航選單配置
-# 定義網站的各種導航選單
-
-# 主導航選單
+# 主導航菜單
 [[main]]
-name = "首頁"
-url = "/"
-weight = 10
+  name = "首頁"
+  url = "/"
+  weight = 10
 
 [[main]]
-name = "部落格"
-url = "/blogs/"
-weight = 20
+  name = "文章"
+  url = "/blogs/"
+  weight = 20
 
 [[main]]
-name = "分類"
-url = "/categories/"
-weight = 30
+  name = "分類"
+  url = "/categories/"
+  weight = 30
 
 [[main]]
-name = "標籤"
-url = "/tags/"
-weight = 40
+  name = "標籤"
+  url = "/tags/"
+  weight = 40
 
 [[main]]
-name = "關於"
-url = "/about/"
-weight = 50
+  name = "系列"
+  url = "/series/"
+  weight = 50
 
-# 頁腳選單
+[[main]]
+  name = "作者"
+  url = "/authors/"
+  weight = 60
+
+[[main]]
+  name = "關於"
+  url = "/about/"
+  weight = 70
+
+# 頁尾菜單
 [[footer]]
-name = "隱私政策"
-url = "/privacy/"
-weight = 10
-
-[[footer]]
-name = "使用條款"
-url = "/terms/"
-weight = 20
-
-[[footer]]
-name = "聯絡我們"
-url = "/contact/"
-weight = 30
+  name = "隱私政策"
+  url = "/privacy/"
+  weight = 10
 
 [[footer]]
-name = "網站地圖"
-url = "/sitemap.xml"
-weight = 40
+  name = "使用條款"
+  url = "/terms/"
+  weight = 20
 
-# 社群媒體選單
-[[social]]
-name = "GitHub"
-url = "https://github.com/"
-identifier = "github"
-weight = 10
+[[footer]]
+  name = "聯絡我們"
+  url = "/contact/"
+  weight = 30
 
-[[social]]
-name = "Twitter"
-url = "https://twitter.com/"
-identifier = "twitter"
-weight = 20
+[[footer]]
+  name = "網站地圖"
+  url = "/sitemap.xml"
+  weight = 40
 
-[[social]]
-name = "LinkedIn"
-url = "https://linkedin.com/"
-identifier = "linkedin"
-weight = 30
+# 側邊欄菜單 (快速連結)
+[[sidebar]]
+  name = "最新文章"
+  url = "/blogs/"
+  weight = 10
 
-[[social]]
-name = "Facebook"
-url = "https://facebook.com/"
-identifier = "facebook"
-weight = 40
+[[sidebar]]
+  name = "熱門標籤"
+  url = "/tags/"
+  weight = 20
 
-# 管理選單 (登入後顯示)
-[[admin]]
-name = "儀表板"
-url = "/admin/dashboard/"
-weight = 10
-
-[[admin]]
-name = "新增文章"
-url = "/admin/posts/new/"
-weight = 20
-
-[[admin]]
-name = "管理文章"
-url = "/admin/posts/"
-weight = 30
-
-[[admin]]
-name = "設定"
-url = "/admin/settings/"
-weight = 40
+[[sidebar]]
+  name = "文章系列"
+  url = "/series/"
+  weight = 30
