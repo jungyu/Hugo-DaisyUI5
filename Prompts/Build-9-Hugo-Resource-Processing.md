@@ -32,23 +32,28 @@
   <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
   <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ end }}">
   
+  <!-- 關鍵 CSS 內聯 -->
+  {{ partial "critical-css.html" . }}
+  
   <!-- 使用 Hugo Pipes 處理 CSS -->
-  {{ $styles := resources.Get "css/app.css" }}
+  {{ $commonStyles := resources.Get "css/app.css" | resources.PostCSS }}
   
   {{ if hugo.IsProduction }}
-    <!-- 生產環境: PostCSS 處理 + 最小化 -->
-    {{ $styles = $styles | resources.PostCSS | minify | fingerprint "sha512" }}
-    <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}" crossorigin="anonymous">
+    <!-- 生產環境: 最小化 + 指紋碼 -->
+    {{ $commonStyles = $commonStyles | minify | fingerprint "sha512" }}
+    <link rel="preload" href="{{ $commonStyles.RelPermalink }}" as="style">
+    <link rel="stylesheet" href="{{ $commonStyles.RelPermalink }}" integrity="{{ $commonStyles.Data.Integrity }}" crossorigin="anonymous" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="{{ $commonStyles.RelPermalink }}" integrity="{{ $commonStyles.Data.Integrity }}" crossorigin="anonymous"></noscript>
   {{ else }}
-    <!-- 開發環境: 僅 PostCSS 處理 -->
-    {{ $styles = $styles | resources.PostCSS }}
-    <link rel="stylesheet" href="{{ $styles.RelPermalink }}">
+    <!-- 開發環境 -->
+    <link rel="stylesheet" href="{{ $commonStyles.RelPermalink }}">
   {{ end }}
   
-  <!-- 添加字體資源 -->
+  <!-- 字體預載 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet"></noscript>
   
   <!-- 其他頭部元素... -->
 </head>
@@ -56,15 +61,44 @@
 
 #### 1.2 PostCSS 配置
 
-**確保 Hugo 項目根目錄已有 `postcss.config.js`:**
+**確保 Hugo 項目根目錄已有 `postcss.config.mjs`:**
 
 ```javascript
-// 確保已包含所有必要的 PostCSS 插件
-module.exports = {
+// postcss.config.mjs
+export default {
   plugins: {
-    'tailwindcss': {},
-    'autoprefixer': {},
-  }
+    "@tailwindcss/postcss": {},
+    autoprefixer: {},
+  },
+}
+```
+
+**注意**:
+
+- 使用 `.mjs` 副檔名，這是 Tailwind v4 的推薦做法
+- 使用 ES6 模組語法 (`export default`)，而不是 CommonJS 的 `module.exports`
+- 使用 `@tailwindcss/postcss` 而非傳統的 `tailwindcss` 外掛
+- 確保 Node.js 環境支持 ES 模組，或在 package.json 中添加 `"type": "module"`
+
+**生產環境可擴展配置:**
+
+```javascript
+// postcss.config.mjs
+import cssnano from 'cssnano';
+
+export default {
+  plugins: {
+    "@tailwindcss/postcss": {},
+    autoprefixer: {},
+    ...(process.env.NODE_ENV === 'production' ? {
+      cssnano: {
+        preset: ['default', {
+          discardComments: { removeAll: true },
+          normalizeWhitespace: false,
+        }],
+      },
+    } : {}),
+  },
 }
 ```
 
@@ -103,18 +137,7 @@ module.exports = {
 // 主要 JavaScript 入口文件
 // 由 Hugo Pipes 處理並自動監測所有模組導入
 
-// 核心功能
-import './core/theme'
-import './core/navigation'
-import './core/search'
-
-// 互動元件
-import './components/modal'
-import './components/dropdown'
-import './components/tabs'
-import './components/carousel'
-
-// Alpine.js 配置
+// Alpine.js 核心及插件
 import Alpine from 'alpinejs'
 import intersect from '@alpinejs/intersect'
 import persist from '@alpinejs/persist'
@@ -122,6 +145,15 @@ import persist from '@alpinejs/persist'
 // 註冊 Alpine.js 插件
 Alpine.plugin(intersect)
 Alpine.plugin(persist)
+
+// 自定義 Alpine.js 元件
+import './components/dropdown'
+import './components/modal'
+import './components/tabs'
+import './components/darkMode'
+import './components/search'
+import './components/fontSize'
+import './components/dateFormat'
 
 // 公開 Alpine.js 實例
 window.Alpine = Alpine
@@ -151,6 +183,19 @@ bgColor = "#ffffff"
   disableLatLong = true
   includeFields = ""
   excludeFields = ""
+```
+
+**或在 `hugo.yaml` 中添加相關配置:**
+
+```yaml
+imaging:
+  quality: 90
+  resampleFilter: lanczos
+  anchor: smart
+  bgColor: "#ffffff"
+  exif:
+    disableDate: true
+    disableLatLong: true
 ```
 
 #### 3.2 自適應圖片 Shortcode
@@ -219,16 +264,50 @@ bgColor = "#ffffff"
 mkdir -p themes/twda_v5/assets/css/bundles
 ```
 
-**建立通用 CSS Bundle (`themes/twda_v5/assets/css/bundles/common.css`):**
+**建立主要 CSS Bundle (`themes/twda_v5/assets/css/app.css`):**
 
 ```css
-/* 核心樣式 - 所有頁面都載入 */
+/* TailwindCSS v4 + DaisyUI v5 完整整合 */
 @import "tailwindcss";
-@import "daisyui/dist/daisyui.css";
-@import "../utils.css";
+@plugin "daisyui";
+
+/* 自定義 CSS 變數與中文排版優化 */
+:root {
+  /* 字體系統 */
+  --font-chinese: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "微軟正黑體", "Heiti TC", sans-serif;
+  --font-english: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Consolas, "Monaco", "Cascadia Code", monospace;
+}
+
+/* 全局基礎樣式 */
+html {
+  font-family: var(--font-chinese);
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 中文排版優化 */
+.prose {
+  font-family: var(--font-chinese);
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+}
+
+/* 主題切換動畫 */
+html[data-theme], html.dark {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 導入元件樣式 */
+@import "./components/buttons.css";
+@import "./components/cards.css";
+@import "./components/forms.css";
 ```
 
-**建立文章頁面 CSS Bundle (`themes/twda_v5/assets/css/bundles/post.css`):**
+**建立文章頁面額外樣式 (`themes/twda_v5/assets/css/bundles/post.css`):**
 
 ```css
 /* 文章頁面特定樣式 */
@@ -241,19 +320,25 @@ mkdir -p themes/twda_v5/assets/css/bundles
 
 ```html
 <!-- 基本樣式 (所有頁面) -->
-{{ $common := resources.Get "css/bundles/common.css" | resources.PostCSS }}
-<link rel="stylesheet" href="{{ $common.RelPermalink }}">
+{{ $commonStyles := resources.Get "css/app.css" | resources.PostCSS }}
+{{ if hugo.IsProduction }}
+  {{ $commonStyles = $commonStyles | minify | fingerprint "sha512" }}
+{{ end }}
+<link rel="stylesheet" href="{{ $commonStyles.RelPermalink }}"{{ if hugo.IsProduction }} integrity="{{ $commonStyles.Data.Integrity }}" crossorigin="anonymous"{{ end }}>
 
 <!-- 條件性載入頁面特定樣式 -->
 {{ if eq .Type "posts" }}
   {{ $postStyles := resources.Get "css/bundles/post.css" | resources.PostCSS }}
-  <link rel="stylesheet" href="{{ $postStyles.RelPermalink }}">
+  {{ if hugo.IsProduction }}
+    {{ $postStyles = $postStyles | minify | fingerprint "sha512" }}
+  {{ end }}
+  <link rel="stylesheet" href="{{ $postStyles.RelPermalink }}"{{ if hugo.IsProduction }} integrity="{{ $postStyles.Data.Integrity }}" crossorigin="anonymous"{{ end }}>
 {{ end }}
 ```
 
 #### 4.2 JavaScript 懶加載與條件載入
 
-**建立 JavaScript 加載器 (`themes/twda_v5/assets/js/loader.js`):**
+**建立 JavaScript 加載器 (`themes/twda_v5/assets/js/utils/loader.js`):**
 
 ```javascript
 // JavaScript 模組懶加載器
@@ -266,7 +351,7 @@ const moduleLoader = {
     if (!condition || this.loadedModules[moduleName]) return Promise.resolve()
     
     return new Promise((resolve, reject) => {
-      import(/* @vite-ignore */ `./modules/${moduleName}.js`)
+      import(/* @vite-ignore */ `../modules/${moduleName}.js`)
         .then(module => {
           this.loadedModules[moduleName] = true
           if (typeof module.default === 'function') {
@@ -286,35 +371,56 @@ const moduleLoader = {
 export default moduleLoader
 ```
 
-**使用加載器延遲載入功能 (`themes/twda_v5/assets/js/app.js`):**
+**延遲加載模組範例 (`themes/twda_v5/assets/js/modules/lazy-modules.js`):**
 
 ```javascript
-// 導入核心功能
-import './core/theme'
-import './core/navigation'
-
 // 導入模組加載器
-import moduleLoader from './loader'
+import moduleLoader from '../utils/loader'
 
-// 初始化 Alpine.js
-import Alpine from 'alpinejs'
-import persist from '@alpinejs/persist'
-Alpine.plugin(persist)
-window.Alpine = Alpine
-Alpine.start()
-
-// 按需載入模組
-document.addEventListener('DOMContentLoaded', () => {
+// 設定頁面特定元件的延遲加載
+export function setupLazyLoading() {
   // 在文章頁面載入語法高亮和目錄
-  moduleLoader.load('syntax-highlight', document.querySelector('.article-content pre code'))
-  moduleLoader.load('table-of-contents', document.querySelector('.toc'))
+  if (document.querySelector('.article-content')) {
+    moduleLoader.load('syntax-highlight', document.querySelector('.article-content pre code'))
+    moduleLoader.load('table-of-contents', document.querySelector('.toc'))
+  }
   
   // 如果頁面上有搜尋框，載入搜尋功能
   moduleLoader.load('search', document.querySelector('.search-container'))
   
   // 如果頁面上有輪播，載入輪播功能
   moduleLoader.load('carousel', document.querySelector('.carousel'))
-})
+}
+
+// 加入 DOM 內容載入後啟動
+document.addEventListener('DOMContentLoaded', setupLazyLoading)
+```
+
+**更新主應用程式 JS 導入延遲加載 (`themes/twda_v5/assets/js/app.js`):**
+
+```javascript
+// Alpine.js 核心及插件
+import Alpine from 'alpinejs'
+import intersect from '@alpinejs/intersect'
+import persist from '@alpinejs/persist'
+
+// 註冊 Alpine.js 插件
+Alpine.plugin(intersect)
+Alpine.plugin(persist)
+
+// 自定義 Alpine.js 元件
+import './components/dropdown'
+import './components/modal'
+import './components/tabs'
+import './components/darkMode'
+import './components/search'
+
+// 配置懶加載模組
+import './modules/lazy-modules'
+
+// 啟動 Alpine.js
+window.Alpine = Alpine
+Alpine.start()
 ```
 
 ### 5. 資源預加載和關鍵 CSS 內聯
@@ -394,16 +500,25 @@ document.addEventListener('DOMContentLoaded', () => {
   {{ partial "critical-css.html" . }}
   
   <!-- 使用 preload 指示關鍵資源 -->
-  <link rel="preload" href="{{ (resources.Get "css/bundles/common.css" | resources.PostCSS).RelPermalink }}" as="style">
-  <link rel="preload" href="{{ (resources.Get "js/app.js" | js.Build (dict "minify" true)).RelPermalink }}" as="script">
+  {{ $commonStyles := resources.Get "css/app.css" | resources.PostCSS }}
+  {{ $js := resources.Get "js/app.js" | js.Build (dict "minify" hugo.IsProduction) }}
+  
+  {{ if hugo.IsProduction }}
+    {{ $commonStyles = $commonStyles | minify | fingerprint "sha512" }}
+    {{ $js = $js | fingerprint "sha512" }}
+  {{ end }}
+  
+  <link rel="preload" href="{{ $commonStyles.RelPermalink }}" as="style">
+  <link rel="preload" href="{{ $js.RelPermalink }}" as="script">
   
   <!-- 字體預載 -->
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" as="style">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   
   <!-- 延遲加載非關鍵 CSS -->
-  <link rel="stylesheet" href="{{ (resources.Get "css/bundles/common.css" | resources.PostCSS).RelPermalink }}" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="{{ (resources.Get "css/bundles/common.css" | resources.PostCSS).RelPermalink }}"></noscript>
+  <link rel="stylesheet" href="{{ $commonStyles.RelPermalink }}"{{ if hugo.IsProduction }} integrity="{{ $commonStyles.Data.Integrity }}" crossorigin="anonymous"{{ end }} media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="{{ $commonStyles.RelPermalink }}"{{ if hugo.IsProduction }} integrity="{{ $commonStyles.Data.Integrity }}" crossorigin="anonymous"{{ end }}></noscript>
   
   <!-- 其他頭部標籤... -->
 </head>
@@ -431,30 +546,32 @@ for cmd in jpegoptim optipng pngquant svgo brotli gzip; do
     echo "❌ 找不到命令 $cmd。請安裝所需工具。"
     exit 1
   fi
-fi
+done
+
+# 原始大小記錄
+original_size=$(du -sh public | cut -f1)
 
 # 最佳化 JPEG 圖片
 echo "📷 最佳化 JPEG 圖片..."
-find public -type f -name "*.jpg" -o -name "*.jpeg" | xargs jpegoptim --max=85 --strip-all --all-progressive --quiet
+find public -type f \( -name "*.jpg" -o -name "*.jpeg" \) | xargs -I{} jpegoptim --max=85 --strip-all --all-progressive --quiet "{}"
 
 # 最佳化 PNG 圖片
 echo "📷 最佳化 PNG 圖片..."
-find public -type f -name "*.png" | xargs optipng -quiet -o5
-find public -type f -name "*.png" | xargs pngquant --quality=65-80 --skip-if-larger --force --ext=.png
+find public -type f -name "*.png" | xargs -I{} optipng -quiet -o5 "{}"
+find public -type f -name "*.png" | xargs -I{} pngquant --quality=65-80 --skip-if-larger --force --ext=.png --output="{}" "{}"
 
 # 最佳化 SVG
 echo "🖌️ 最佳化 SVG 圖片..."
-find public -type f -name "*.svg" | xargs svgo --multipass --quiet
+find public -type f -name "*.svg" | xargs -I{} svgo --multipass --quiet "{}"
 
 # 產生壓縮版本
 echo "🗜️ 產生 Brotli 壓縮版本..."
-find public -type f \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.xml" -o -name "*.svg" -o -name "*.json" \) | xargs brotli -q 11 -f
+find public -type f \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.xml" -o -name "*.svg" -o -name "*.json" \) | xargs -I{} brotli -q 11 -f "{}"
 
 echo "🗜️ 產生 Gzip 壓縮版本..."
-find public -type f \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.xml" -o -name "*.svg" -o -name "*.json" \) | xargs gzip -9 -k -f
+find public -type f \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.xml" -o -name "*.svg" -o -name "*.json" \) | xargs -I{} gzip -9 -k -f "{}"
 
-# 計算節省的空間
-original_size=$(du -sh public | cut -f1)
+# 最終大小記錄
 compressed_size=$(du -sh public | cut -f1)
 
 echo "✅ 資源最佳化完成！"
@@ -475,6 +592,65 @@ echo "🏁 完成!"
 chmod +x scripts/optimize.sh
 ```
 
+### 7. Alpine.js 資源整合與優化
+
+配合階段 7 中的 Alpine.js 整合，我們需要確保其 JavaScript 資源能夠正確處理：
+
+**優化 Alpine.js 載入方式:**
+
+```html
+<!-- 在 head.html 中加入 Alpine.js 相關預載 -->
+<head>
+  <!-- 其他頭部標籤... -->
+  
+  <!-- Alpine.js 初始化腳本 - 避免閃爍問題 -->
+  <script>
+    // 初始化 Alpine 元素為不可見，以避免閃爍
+    document.addEventListener('alpine:init', () => {
+      Alpine.store('theme', {
+        dark: localStorage.getItem('theme') === 'dark',
+      });
+    });
+  </script>
+  
+  <!-- 使用 Hugo Pipes 處理 JavaScript -->
+  {{ $js := resources.Get "js/app.js" | js.Build (dict "minify" hugo.IsProduction) }}
+  {{ if hugo.IsProduction }}
+    {{ $js = $js | fingerprint "sha512" }}
+    <link rel="preload" href="{{ $js.RelPermalink }}" as="script">
+    <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" crossorigin="anonymous" defer></script>
+  {{ else }}
+    <script src="{{ $js.RelPermalink }}" defer></script>
+  {{ end }}
+</head>
+```
+
+**Alpine.js 與 DaisyUI 主題同步:**
+
+```javascript
+// themes/twda_v5/assets/js/components/darkMode.js
+document.addEventListener('alpine:init', () => {
+  Alpine.data('darkMode', () => ({
+    dark: localStorage.getItem('theme') === 'dark',
+    
+    init() {
+      this.$watch('dark', (val) => {
+        // 同步 Alpine.js 的 dark 模式與 DaisyUI 主題
+        localStorage.setItem('theme', val ? 'dark' : 'light')
+        document.documentElement.setAttribute('data-theme', val ? 'dark' : 'light')
+      })
+      
+      // 初始化 DaisyUI 主題
+      document.documentElement.setAttribute('data-theme', this.dark ? 'dark' : 'light')
+    },
+    
+    toggle() {
+      this.dark = !this.dark
+    }
+  }))
+})
+```
+
 ## 驗證與檢查
 
 完成 Hugo 資源處理配置後，請確認以下事項：
@@ -483,6 +659,8 @@ chmod +x scripts/optimize.sh
 - [ ] 圖片處理和最佳化功能正常工作
 - [ ] 自適應圖片 shortcode 可正常使用
 - [ ] 資源預加載和關鍵 CSS 正確實作
+- [ ] Alpine.js 整合無閃爍問題
+- [ ] DaisyUI 主題切換功能正常
 - [ ] 檢查網站效能以確認最佳化是否有效
 
 ## AI Prompt 協助
@@ -496,7 +674,12 @@ chmod +x scripts/optimize.sh
 ---
 
 📚 **相關資源:**
+
 - [Hugo Pipes 文件](https://gohugo.io/hugo-pipes/)
 - [Hugo 圖片處理](https://gohugo.io/content-management/image-processing/)
 - [Web 效能最佳實踐](https://web.dev/performance-scoring/)
 - [使用 Hugo 的資源最佳化指南](https://discourse.gohugo.io/t/resource-optimization-in-hugo/13704)
+- [Alpine.js 官方文件](https://alpinejs.dev/)
+- [Tailwind CSS v4 官方文件](https://tailwindcss.com/docs/installation)
+- [DaisyUI v5 官方文件](https://daisyui.com/docs/)
+- [PostCSS 官方文件](https://postcss.org/)

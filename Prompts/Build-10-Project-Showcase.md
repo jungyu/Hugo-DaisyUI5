@@ -3,7 +3,7 @@
 > **專案狀態**: ✅ 進行中  
 > **技術棧**: Hugo v0.147.9 + TailwindCSS v4.1.11 + DaisyUI v5.0.43 + Alpine.js v3.14.9
 
-本階段專注於建立專案展示頁面，實現各種常見的布局和功能，展示完整專案範例，驗證整合所有技術棧的實際效果。
+本階段專注於建立專案展示頁面，實現各種常見的布局和功能，展示完整專案範例，驗證整合所有技術棧的實際效果。此階段的內容結構和配置設定已與[階段 6：Hugo 配置系統](./Build-6-Hugo-Configuration.md)同步，確保專案的一致性。
 
 ## 階段目標
 
@@ -11,11 +11,13 @@
 - 實現常見的 UI 模式和布局
 - 展示互動元件和功能
 - 測試整個技術棧的整合效果
+- 確保內容結構與 Hugo 配置系統一致
 
 ## 前置條件
 
+✅ 已完成 [階段 6：Hugo 配置系統](./Build-6-Hugo-Configuration.md)  
 ✅ 已完成 [階段 9：Hugo 資源處理](./Build-9-Hugo-Resource-Processing.md)  
-✅ 資源處理系統已正確配置
+✅ 配置系統和資源處理已正確設置
 
 ## 步驟詳解
 
@@ -30,10 +32,11 @@
 # cd hugo-twda-v5  # 如果尚未切換到此目錄
 
 # 建立範例內容目錄
-mkdir -p content/zh-tw/{posts,pages,projects}
+# 根據 Build-6 的配置，內容目錄應該與默認語言設置對齊
+mkdir -p content/{posts,pages,projects}
 
 # 建立首頁內容
-cat > content/zh-tw/_index.md << 'EOF'
+cat > content/_index.md << 'EOF'
 ---
 title: "Hugo-DaisyUI5 示範網站"
 description: "基於 Hugo v0.147.9 + TailwindCSS v4.1.11 + DaisyUI v5.0.43 + Alpine.js v3.14.9 的現代靜態網站"
@@ -44,8 +47,8 @@ draft: false
 歡迎來到 Hugo-DaisyUI5 示範網站！這個專案展示了如何將 Hugo、TailwindCSS v4、DaisyUI v5 和 Alpine.js 整合在一起，創建一個現代化、高效能且易於維護的靜態網站。
 EOF
 
-# 建立關於頁面
-cat > content/zh-tw/pages/about.md << 'EOF'
+# 建立關於頁面 (使用 Build-6 中的 URL 模式配置)
+cat > content/pages/about.md << 'EOF'
 ---
 title: "關於專案"
 description: "關於 Hugo-DaisyUI5 專案的詳細資訊"
@@ -90,8 +93,8 @@ Hugo-DaisyUI5 是一個示範專案，旨在展示如何整合下列技術：
 如有任何問題，請通過 [GitHub](https://github.com/yourusername/hugo-daisyui5) 聯繫我們。
 EOF
 
-# 建立範例文章
-cat > content/zh-tw/posts/getting-started.md << 'EOF'
+# 建立範例文章 (使用 Build-6 中的 posts 目錄)
+cat > content/posts/getting-started.md << 'EOF'
 ---
 title: "開始使用 Hugo-DaisyUI5"
 description: "如何開始使用和自訂 Hugo-DaisyUI5 專案"
@@ -170,8 +173,8 @@ hugo --minify
 - 了解 [進階自訂](/advanced/)
 EOF
 
-# 建立另一篇範例文章
-cat > content/zh-tw/posts/component-showcase.md << 'EOF'
+# 建立另一篇範例文章 (使用 Build-6 中的 posts 目錄)
+cat > content/posts/component-showcase.md << 'EOF'
 ---
 title: "DaisyUI v5 元件展示"
 description: "展示 DaisyUI v5 提供的各種元件及其用法"
@@ -244,8 +247,8 @@ DaisyUI v5 允許您輕鬆定制和切換主題：
 DaisyUI v5 與 TailwindCSS v4 和 Alpine.js 的組合提供了強大而靈活的 UI 開發能力，讓您能夠快速構建現代化的網站界面。
 EOF
 
-# 建立範例項目頁面
-cat > content/zh-tw/projects/sample-project.md << 'EOF'
+# 建立範例項目頁面 (使用 Build-6 中的 projects 目錄)
+cat > content/projects/sample-project.md << 'EOF'
 ---
 title: "樣本專案展示"
 description: "展示 Hugo-DaisyUI5 專案的完整功能"
@@ -1060,14 +1063,37 @@ menu:
 - [ ] Alpine.js 互動功能正常運作
 - [ ] 主題切換功能可以正常使用
 - [ ] 各種布局範例展示正確
+- [ ] 內容目錄結構與 Build-6 中的配置一致
+- [ ] 選單項目正確顯示在導航中
+- [ ] 永久連結格式正確（遵循 permalinks.toml 設置）
+- [ ] 多語言支援功能正常（如果已啟用）
 
 ## AI Prompt 協助
 
 > 我已經完成了 Hugo-DaisyUI5 專案的展示頁面，但有些元件的互動功能不正常工作。特別是主題切換和標籤頁切換功能似乎有問題。請幫我檢查 Alpine.js 的初始化和數據綁定是否正確，以及是否有任何 JavaScript 錯誤。
 
+## 使用 Hugo 配置系統（與階段 6 一致）
+
+為確保專案展示與範例能夠正確運行，請確保已完成 [階段 6：Hugo 配置系統](./Build-6-Hugo-Configuration.md) 中的配置設置。特別是：
+
+1. **配置檔案結構**：確保 `config/_default/` 目錄中有正確的配置文件
+2. **選單配置**：確認 `menus.toml` 中已設置正確的選單項目
+3. **永久連結配置**：確保使用新的 `:contentbasename` 語法而非舊的 `:filename` 語法
+4. **內容結構**：根據選用的語言配置，確保內容目錄結構正確
+
+**檢查配置與範例一致性：**
+
+```bash
+# 驗證配置是否正確
+hugo config
+
+# 啟動本地服務器查看範例
+hugo server -D
+```
+
 ## 下一階段
 
-✅ [階段 11：建構優化與 SEO](./Build-11-Build-Optimization.md) - 實施進階的建構優化和 SEO 最佳實踐，確保網站高效且對搜尋引擎友好。
+✅ [階段 11：建構優化與 SEO](./Build-11-SEO-Optimization.md) - 實施進階的建構優化和 SEO 最佳實踐，確保網站高效且對搜尋引擎友好。
 
 ---
 
@@ -1076,3 +1102,5 @@ menu:
 - [Alpine.js 指南](https://alpinejs.dev/start-here)
 - [Hugo 範本指南](https://gohugo.io/templates/introduction/)
 - [TailwindCSS v4 文檔](https://tailwindcss.com/docs)
+- [Hugo 配置文件](https://gohugo.io/getting-started/configuration/)
+- [Hugo 多語言支援](https://gohugo.io/content-management/multilingual/)

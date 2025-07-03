@@ -1,42 +1,27 @@
-# Hugo + TailwindCSS + DaisyUI 專案 - 第11階段：建構優化與 SEO
+# Hugo 專案建構階段 11：建構優化與 SEO
 
-> 本文檔是 Hugo + TailwindCSS + DaisyUI v5 專案建構指南的第11階段，專注於建構優化與 SEO 設定。
->
-> 基於 Hugo v0.147.9 官方架構標準，整合 TailwindCSS v4.1.11、DaisyUI v5.0.43、Alpine.js v3.14.9 的現代化靜態網站建構方案。
+> **專案狀態**: ✅ 進行中  
+> **技術棧**: Hugo v0.147.9 + TailwindCSS v4.1.11 + DaisyUI v5.0.43 + Alpine.js v3.14.9
 
-## 前情回顧
+本階段專注於網站的建構優化與 SEO 設定，確保網站在搜尋引擎中的可見性和效能表現，同時優化整體建構流程。
 
-在進入第11階段前，您應該已經完成：
+## 階段目標
 
-- **第1階段**：環境準備與驗證
-- **第2階段**：Hugo 專案初始化
-- **第3階段**：主題架構建立
-- **第4階段**：基礎 HTML 模板
-- **第5階段**：前端技術整合
-- **第6階段**：Hugo 配置系統
-- **第7階段**：Alpine.js 整合
-- **第8階段**：CSS 框架整合與自定義元件
-- **第9階段**：Hugo 資源處理
-- **第10階段**：專案展示與範例
+- 配置 Hugo 圖片最佳化處理
+- 設置 SEO 相關 Meta 標籤和結構化數據
+- 創建生產環境建構與檢查腳本
+- 優化網站載入速度和使用者體驗
 
-現在，我們將專注於網站的建構優化與 SEO 設定，確保網站在搜尋引擎中的可見性和效能表現。
+## 前置條件
 
-## 目錄
+✅ 已完成 [階段 10：專案展示與範例](./Build-10-Project-Showcase.md)  
+✅ 已建立基本網站內容和主題展示
 
-1. [Hugo 圖片最佳化配置](#1-hugo-圖片最佳化配置)
-   - [圖片處理配置](#11-圖片處理配置)
-   - [配置文件結構最佳實踐](#12-配置文件結構最佳實踐)
-2. [生產環境建構腳本](#2-生產環境建構腳本)
-   - [建構腳本設置](#21-建構腳本設置)
-   - [SEO 與效能檢查腳本](#22-seo-與效能檢查腳本)
-3. [下一階段預告](#下一階段預告)
-4. [階段導航](#階段導航)
+## 步驟詳解
 
----
+### 1. Hugo 圖片最佳化配置
 
-## 1. Hugo 圖片最佳化配置
-
-### 1.1 圖片處理配置
+#### 1.1 圖片處理配置
 
 Hugo Extended 版本提供了強大的圖片處理功能，可以生成現代格式（WebP/AVIF）和多尺寸響應式圖片。
 
@@ -46,54 +31,57 @@ Hugo Extended 版本提供了強大的圖片處理功能，可以生成現代格
 # 創建 Hugo 圖片處理配置 (支援 WebP/AVIF 現代格式)
 cat > config/_default/imaging.toml << 'EOF'
 # Hugo v0.147.9 圖片處理配置
-# 支援 WebP/AVIF 現代格式與多尺寸響應式圖片
-
 [imaging]
   # 圖片處理品質設定
-  quality = 85
+  quality = 90
   
   # 圖片重採樣濾波器 (Lanczos: 高品質但較慢, Box: 快速但品質較低)
-  resampleFilter = "Lanczos"
+  resampleFilter = "lanczos"
   
   # 錨點設定 (用於裁切)
-  anchor = "Smart"
+  anchor = "smart"
   
   # 背景顏色 (透明圖片轉換為不支援透明格式時使用)
   bgColor = "#ffffff"
-  
-  # EXIF 方向處理
-  exif = "IncludeFields"
 
-# 響應式圖片尺寸配置 (用於 Hugo 圖片處理管道)
-[params.images]
-  # 標準響應式斷點
-  sizes = [
-    { width = 480, suffix = "xs" },
-    { width = 768, suffix = "sm" },
-    { width = 1024, suffix = "md" },
-    { width = 1366, suffix = "lg" },
-    { width = 1920, suffix = "xl" }
-  ]
-  
-  # 現代格式優先級
-  formats = ["avif", "webp", "jpg"]
-  
-  # 品質設定 (按格式)
-  quality = {
-    avif = 80,
-    webp = 85,
-    jpg = 90,
-    png = 95
-  }
-  
-  # 載入策略
-  loading = "lazy"
-  decoding = "async"
-  
-  # 圖片最佳化選項
-  optimize = true
-  progressive = true
-  stripMetadata = true
+[exif]
+  disableDate = true
+  disableLatLong = true
+  includeFields = ""
+  excludeFields = ""
+EOF
+
+# 創建參數配置 (包含圖片處理擴展設定)
+cat > config/_default/params.toml << 'EOF'
+# 響應式圖片配置
+[images]
+# 標準響應式斷點
+sizes = [
+  { width = 480, suffix = "xs" },
+  { width = 768, suffix = "sm" },
+  { width = 1024, suffix = "md" },
+  { width = 1366, suffix = "lg" },
+  { width = 1920, suffix = "xl" }
+]
+
+# 現代格式優先級
+formats = ["avif", "webp", "jpg"]
+
+# 品質設定
+[images.quality]
+avif = 80
+webp = 85
+jpg = 90
+png = 95
+
+# 載入策略
+loading = "lazy"
+decoding = "async"
+
+# 圖片最佳化選項
+optimize = true
+progressive = true
+stripMetadata = true
 EOF
 ```
 
@@ -228,88 +216,290 @@ cat > themes/twda_v5/layouts/partials/helpers/picture-element.html << 'EOF'
 EOF
 ```
 
-### 1.2 配置文件結構最佳實踐
+#### 1.2 圖片處理 Shortcode 和 Partial
 
-在實際操作中，我們發現 Hugo 的配置文件結構需要遵循一些最佳實踐：
+為了更好地管理和組織圖片處理功能，我們將創建專用的 Shortcode 和 Partial：
 
-**注意事項:**
-
-1. **配置文件分離**：
-   - `imaging.toml` 應僅包含 `[imaging]` 部分
-   - 圖片相關的其他參數應放在 `params.toml` 中的 `[images]` 部分
-
-2. **正確的 TOML 語法**：
-   - 避免在數組和表格間的語法混淆
-   - 確保縮進和嵌套結構正確
-
-**正確的配置文件結構:**
+##### 1.2.1 基礎圖片處理 Shortcode
 
 ```bash
-# 創建 imaging.toml (只包含 [imaging] 部分)
-cat > config/_default/imaging.toml << 'EOF'
-# Hugo v0.147.9 圖片處理配置
+# 創建圖片處理 Shortcode 目錄
+mkdir -p themes/twda_v5/layouts/shortcodes
 
-[imaging]
-  # 圖片處理品質設定
-  quality = 85
+# 創建自適應圖片 Shortcode
+cat > themes/twda_v5/layouts/shortcodes/adaptive-image.html << 'EOF'
+{{ $src := .Get "src" }}
+{{ $alt := .Get "alt" | default "" }}
+{{ $class := .Get "class" | default "" }}
+{{ $caption := .Get "caption" | default "" }}
+{{ $lazy := .Get "lazy" | default "true" }}
+
+{{ $image := resources.Get $src }}
+{{ if $image }}
+  {{ $tiny := $image.Resize "20x jpg q20" }}
+  {{ $small := $image.Resize "600x webp q85" }}
+  {{ $medium := $image.Resize "1200x webp q85" }}
+  {{ $large := $image.Resize "1800x webp q85" }}
+  {{ $original := $image.Resize "2400x webp q90" }}
   
-  # 圖片重採樣濾波器 (Lanczos: 高品質但較慢, Box: 快速但品質較低)
-  resampleFilter = "Lanczos"
-  
-  # 錨點設定 (用於裁切)
-  anchor = "Smart"
-  
-  # 背景顏色 (透明圖片轉換為不支援透明格式時使用)
-  bgColor = "#ffffff"
-  
-  # EXIF 方向處理
-  exif = "IncludeFields"
-EOF
-
-# 創建 params.toml (包含圖片相關參數)
-cat > config/_default/params.toml << 'EOF'
-# 響應式圖片配置
-[images]
-# 標準響應式斷點
-sizes = [
-  { width = 480, suffix = "xs" },
-  { width = 768, suffix = "sm" },
-  { width = 1024, suffix = "md" },
-  { width = 1366, suffix = "lg" },
-  { width = 1920, suffix = "xl" }
-]
-
-# 現代格式優先級
-formats = ["avif", "webp", "jpg"]
-
-# 品質設定
-[images.quality]
-avif = 80
-webp = 85
-jpg = 90
-png = 95
-
-# 載入策略
-loading = "lazy"
-decoding = "async"
-
-# 圖片最佳化選項
-optimize = true
-progressive = true
-stripMetadata = true
+  <figure class="{{ $class }}">
+    <div class="relative overflow-hidden">
+      <!-- 模糊載入預覽 -->
+      <img
+        src="{{ $tiny.RelPermalink }}"
+        class="w-full h-auto filter blur-xl absolute inset-0 object-cover"
+        aria-hidden="true"
+      />
+      
+      <!-- 主要自適應圖片 -->
+      <img
+        {{ if eq $lazy "true" }}loading="lazy"{{ end }}
+        src="{{ $small.RelPermalink }}"
+        srcset="
+          {{ $small.RelPermalink }} 600w,
+          {{ $medium.RelPermalink }} 1200w,
+          {{ $large.RelPermalink }} 1800w,
+          {{ $original.RelPermalink }} 2400w
+        "
+        sizes="(max-width: 600px) 100vw, (max-width: 1200px) 85vw, 75vw"
+        alt="{{ $alt }}"
+        width="{{ $image.Width }}"
+        height="{{ $image.Height }}"
+        class="w-full h-auto relative z-10"
+      />
+    </div>
+    
+    {{ if $caption }}
+      <figcaption class="text-sm text-center mt-2 text-base-content/70">{{ $caption | markdownify }}</figcaption>
+    {{ end }}
+  </figure>
+{{ else }}
+  <div class="p-4 bg-error text-error-content rounded">圖片檔案無法載入: {{ $src }}</div>
+{{ end }}
 EOF
 ```
 
-**重要提示:** Hugo 的配置文件需要嚴格遵循 TOML 語法規則，尤其是在處理嵌套結構和數組時。不正確的語法會導致建構失敗，錯誤消息可能會指向特定的行號和語法問題。
+##### 1.2.2 進階圖片處理 Partial
 
-## 2. 生產環境建構腳本
-
-### 2.1 建構腳本設置
-
-為了確保生產環境的建構過程順利且優化，我們需要一個完整的建構腳本：
+如需更進階的圖片處理功能，我們可以創建專用的 Partial 用於整合到其他模板中：
 
 ```bash
+# 創建 helpers 目錄
+mkdir -p themes/twda_v5/layouts/partials/helpers
+
+# 創建圖片處理 Partial
+cat > themes/twda_v5/layouts/partials/helpers/optimize-image.html << 'EOF'
+{{/* 
+    自動圖片最佳化 Partial
+    參數: .src (必須), .alt, .class, .loading, .sizes
+*/}}
+
+{{- $src := .src -}}
+{{- $alt := .alt | default "" -}}
+{{- $class := .class | default "" -}}
+{{- $loading := .loading | default "lazy" -}}
+{{- $sizes := .sizes | default "(min-width: 1024px) 1024px, (min-width: 768px) 768px, 100vw" -}}
+
+{{- with resources.Get $src -}}
+  {{- $original := . -}}
+  {{- $isAnimated := in (slice "gif") $original.MediaType.SubType -}}
+  
+  {{- if $isAnimated -}}
+    {{/* 動畫 GIF 保持原格式 */}}
+    <img src="{{ $original.RelPermalink }}" 
+         alt="{{ $alt }}" 
+         loading="{{ $loading }}"
+         {{- if $class }} class="{{ $class }}"{{ end }}>
+  {{- else -}}
+    {{/* 使用 picture 元素進行格式最佳化 */}}
+    <picture{{ if $class }} class="{{ $class }}"{{ end }}>
+      {{/* WebP 格式 */}}
+      {{- $webp := $original.Resize (printf "q%d webp" (site.Params.images.quality.webp | default 85)) -}}
+      <source srcset="{{ $webp.RelPermalink }}" type="image/webp">
+      
+      {{/* 原始格式後備 */}}
+      {{- $fallback := $original.Resize (printf "q%d" (site.Params.images.quality.jpg | default 90)) -}}
+      <img src="{{ $fallback.RelPermalink }}" 
+           alt="{{ $alt }}" 
+           loading="{{ $loading }}"
+           decoding="async"
+           sizes="{{ $sizes }}">
+    </picture>
+  {{- end -}}
+{{- else -}}
+  {{/* 外部圖片或不存在的圖片 */}}
+  <img src="{{ $src }}" alt="{{ $alt }}" loading="{{ $loading }}"{{ if $class }} class="{{ $class }}"{{ end }}>
+{{- end -}}
+EOF
+```
+
+**重要提示:** 使用 Hugo 的圖片處理功能需要安裝 Hugo Extended 版本，該版本包含了圖片處理所需的依賴庫。確保你的配置文件遵循正確的 TOML 或 YAML 語法，以避免建構錯誤。
+
+### 2. SEO 最佳化配置
+
+#### 2.1 基礎 SEO 設定
+
+Hugo 提供了多種方式來優化網站的 SEO。讓我們創建一個完整的 SEO Partial，包含所有必要的 Meta 標籤：
+
+```bash
+# 創建 SEO Partial
+cat > themes/twda_v5/layouts/partials/head/seo.html << 'EOF'
+{{/* 基本 SEO 標籤 */}}
+<title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} | {{ site.Title }}{{ end }}</title>
+<meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ with site.Params.description }}{{ . }}{{ end }}{{ end }}">
+<link rel="canonical" href="{{ .Permalink }}">
+
+{{/* Open Graph 標籤 */}}
+<meta property="og:locale" content="{{ site.LanguageCode | default "zh-tw" }}">
+<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+<meta property="og:title" content="{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} | {{ site.Title }}{{ end }}">
+<meta property="og:description" content="{{ with .Description }}{{ . }}{{ else }}{{ with site.Params.description }}{{ . }}{{ end }}{{ end }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:site_name" content="{{ site.Title }}">
+{{ if .IsPage }}
+<meta property="article:published_time" content="{{ .PublishDate.Format "2006-01-02T15:04:05-07:00" | safeHTML }}">
+<meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" | safeHTML }}">
+{{ end }}
+
+{{/* Twitter Card 標籤 */}}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} | {{ site.Title }}{{ end }}">
+<meta name="twitter:description" content="{{ with .Description }}{{ . }}{{ else }}{{ with site.Params.description }}{{ . }}{{ end }}{{ end }}">
+
+{{/* 圖片相關 SEO */}}
+{{ with $.Params.image }}
+  {{ $image := resources.Get . }}
+  {{ if $image }}
+    {{ $thumbnail := $image.Fill "1200x630" }}
+    <meta property="og:image" content="{{ $thumbnail.Permalink }}">
+    <meta property="og:image:width" content="{{ $thumbnail.Width }}">
+    <meta property="og:image:height" content="{{ $thumbnail.Height }}">
+    <meta name="twitter:image" content="{{ $thumbnail.Permalink }}">
+  {{ else }}
+    {{/* 使用默認圖片或站點標誌 */}}
+    {{ with site.Params.defaultImage }}
+      <meta property="og:image" content="{{ . | absURL }}">
+      <meta name="twitter:image" content="{{ . | absURL }}">
+    {{ end }}
+  {{ end }}
+{{ else }}
+  {{/* 使用默認圖片或站點標誌 */}}
+  {{ with site.Params.defaultImage }}
+    <meta property="og:image" content="{{ . | absURL }}">
+    <meta name="twitter:image" content="{{ . | absURL }}">
+  {{ end }}
+{{ end }}
+
+{{/* Schema.org JSON-LD 結構化數據 */}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  {{ if .IsHome }}
+  "@type": "WebSite",
+  "name": "{{ site.Title }}",
+  "url": "{{ site.BaseURL }}",
+  "description": "{{ site.Params.description }}",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "{{ site.BaseURL }}search/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+  {{ else if .IsPage }}
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ .Permalink }}"
+  },
+  "headline": "{{ .Title }}",
+  "description": "{{ with .Description }}{{ . }}{{ else }}{{ with site.Params.description }}{{ . }}{{ end }}{{ end }}",
+  "datePublished": "{{ .PublishDate.Format "2006-01-02T15:04:05-07:00" | safeHTML }}",
+  "dateModified": "{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" | safeHTML }}",
+  {{ with site.Params.author }}
+  "author": {
+    "@type": "Person",
+    "name": "{{ . }}"
+  },
+  {{ end }}
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ site.Title }}",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ site.Params.logo | absURL }}"
+    }
+  }
+  {{ end }}
+}
+</script>
+EOF
+```
+
+現在在 `head.html` 中引用這個 SEO Partial：
+
+```bash
+# 修改 head.html 以引用 SEO Partial
+cat > themes/twda_v5/layouts/partials/head.html << 'EOF'
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Meta 標籤 -->
+  {{ partial "head/seo.html" . }}
+  
+  <!-- 關鍵 CSS 內聯 -->
+  {{ partial "critical-css.html" . }}
+  
+  <!-- 使用 Hugo Pipes 處理 CSS -->
+  {{ $commonStyles := resources.Get "css/app.css" | resources.PostCSS }}
+  
+  {{ if hugo.IsProduction }}
+    <!-- 生產環境: 最小化 + 指紋碼 -->
+    {{ $commonStyles = $commonStyles | minify | fingerprint "sha512" }}
+    <link rel="preload" href="{{ $commonStyles.RelPermalink }}" as="style">
+    <link rel="stylesheet" href="{{ $commonStyles.RelPermalink }}" integrity="{{ $commonStyles.Data.Integrity }}" crossorigin="anonymous" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="{{ $commonStyles.RelPermalink }}" integrity="{{ $commonStyles.Data.Integrity }}" crossorigin="anonymous"></noscript>
+  {{ else }}
+    <!-- 開發環境 -->
+    <link rel="stylesheet" href="{{ $commonStyles.RelPermalink }}">
+  {{ end }}
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+  
+  <!-- 頁面特定樣式 -->
+  {{ block "head_styles" . }}{{ end }}
+  
+  <!-- 頁面特定腳本 -->
+  {{ block "head_scripts" . }}{{ end }}
+  
+  <!-- 網站驗證 -->
+  {{ with site.Params.googleSiteVerification }}
+  <meta name="google-site-verification" content="{{ . }}">
+  {{ end }}
+  
+  <!-- 網站圖標 -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+EOF
+```
+
+#### 2.2 SEO 配置與建構腳本
+
+為了確保生產環境的建構過程包含所有 SEO 優化，我們需要一個完整的建構和檢查腳本：
+
+```bash
+# 創建 SEO 配置
+cat > config/_default/sitemap.toml << 'EOF'
+# Sitemap 設定
+changefreq = "weekly"
+filename = "sitemap.xml"
+priority = 0.5
+EOF
+
 # 創建生產環境建構腳本
+mkdir -p scripts
 cat > scripts/build.sh << 'EOF'
 #!/bin/bash
 
@@ -349,13 +539,7 @@ fi
 EOF
 
 chmod +x scripts/build.sh
-```
 
-### 2.2 SEO 與效能檢查腳本
-
-SEO 與效能檢查是確保網站可被搜尋引擎有效索引的關鍵：
-
-```bash
 # 創建 SEO 與效能檢查腳本
 cat > scripts/seo-check.sh << 'EOF'
 #!/bin/bash
@@ -390,50 +574,100 @@ else
   echo "❌ JSON Feed 缺失"
 fi
 
+# 檢查 Schema.org 結構化數據
+echo "正在檢查結構化數據..."
+grep -r "application/ld+json" public/index.html > /dev/null
+if [ $? -eq 0 ]; then
+  echo "✅ Schema.org 結構化數據存在"
+else
+  echo "❌ Schema.org 結構化數據缺失"
+fi
+
 echo "📈 效能檢查完成"
 EOF
 
 chmod +x scripts/seo-check.sh
 ```
 
-**AI Prompt:**
+### 3. 建構優化最佳實踐
 
-```text
-請協助我設置生產環境建構與 SEO 優化，基於 Hugo v0.147.9 官方架構標準：
+在進行生產環境建構時，有一些最佳實踐可以幫助我們獲得更好的效能和用戶體驗：
 
-建構優化：
-- 自動清理舊檔案 (public, resources, .hugo_build.lock)
-- 依賴安裝檢查 (yarn frozen-lockfile)
-- Hugo 生產建構 (--gc --minify --logLevel info)
-- 建構結果統計 (包含 WebP/AVIF 圖片)
+#### 3.1 資源最小化與指紋識別
 
-SEO 檢查：
-- sitemap.xml 生成 (Hugo 自動)
-- robots.txt 配置 (enableRobotsTXT)
-- RSS 訂閱 (index.xml)
-- JSON Feed (index.json) 
-- Open Graph 標籤
-- Twitter Card 標籤
-- 結構化數據 (JSON-LD)
+Hugo Pipes 提供了強大的資源處理功能，可以進行最小化和指紋識別：
 
-Hugo Pipes 資源處理：
-- ESBuild JavaScript 打包和最小化
-- PostCSS CSS 處理和最小化  
-- 圖片優化處理 (WebP, AVIF)
-- 指紋識別和版本控制
+```go
+{{ $style := resources.Get "css/app.css" | resources.PostCSS | minify | fingerprint "sha512" }}
+<link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}">
 
-請說明如何確保 SEO 最佳化與網站效能，遵循 Hugo 官方最佳實踐。
+{{ $script := resources.Get "js/app.js" | js.Build | minify | fingerprint "sha512" }}
+<script src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}"></script>
+```
+
+#### 3.2 延遲載入技術
+
+對於非關鍵資源，我們可以使用延遲載入技術來提高頁面載入速度：
+
+```html
+<!-- 延遲載入 CSS -->
+<link rel="preload" href="/css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/css/main.css"></noscript>
+
+<!-- 延遲載入圖片 -->
+<img src="placeholder.jpg" data-src="actual-image.jpg" loading="lazy" class="lazyload">
+```
+
+#### 3.3 關鍵 CSS 內聯
+
+對於首屏渲染的關鍵 CSS，我們可以將其內聯到 HTML 中，避免網絡請求延遲：
+
+```bash
+# 創建關鍵 CSS Partial
+cat > themes/twda_v5/layouts/partials/critical-css.html << 'EOF'
+<style>
+/* 關鍵渲染路徑 CSS */
+:root {
+  color-scheme: light dark;
+}
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+main {
+  flex: 1;
+}
+img {
+  max-width: 100%;
+  height: auto;
+}
+</style>
+EOF
 ```
 
 ## 驗證清單
 
 在進入下一階段之前，請確認您已完成以下項目：
 
-- [ ] 設置了 Hugo 圖片處理配置，包括支援 WebP/AVIF 格式
-- [ ] 創建了現代圖片處理的 Shortcode 和 Partial
-- [ ] 分離了配置文件以符合 TOML 語法最佳實踐
+- [ ] 設置了 Hugo 圖片處理配置，支援 WebP/AVIF 格式
+- [ ] 創建了自適應圖片的 Shortcode 和 Partial
+- [ ] 設置了完整的 SEO Meta 標籤和結構化數據
+- [ ] 確保配置文件結構符合 Hugo 最佳實踐
 - [ ] 創建並測試了生產環境建構腳本
 - [ ] 設置了 SEO 與效能檢查腳本
+- [ ] 實施了資源最小化和指紋識別功能
+- [ ] 使用延遲載入和關鍵 CSS 內聯技術
+
+## 參考資源
+
+- [Hugo SEO 最佳實踐](https://gohugo.io/templates/seo/)
+- [Hugo 圖片處理](https://gohugo.io/content-management/image-processing/)
+- [Web.dev 性能優化指南](https://web.dev/learn-web-vitals/)
+- [Google 結構化數據測試工具](https://search.google.com/test/rich-results)
+- [TailwindCSS v4 效能優化](https://tailwindcss.com/blog/tailwindcss-v4)
 
 ## 下一階段預告
 
@@ -441,16 +675,16 @@ Hugo Pipes 資源處理：
 
 ## 階段導航
 
-- [第1階段：環境準備與驗證](./Build-1-Environment-Setup.md)
-- [第2階段：Hugo 專案初始化](./Build-2-Hugo-Initialization.md)
-- [第3階段：主題架構建立](./Build-3-Theme-Architecture.md)
-- [第4階段：基礎 HTML 模板](./Build-4-Base-Templates.md)
-- [第5階段：前端技術整合](./Build-5-Frontend-Integration.md)
-- [第6階段：Hugo 配置系統](./Build-6-Hugo-Configuration.md)
-- [第7階段：Alpine.js 整合](./Build-7-Alpinejs-Integration.md)
-- [第8階段：CSS 框架整合與自定義元件](./Build-8-CSS-Framework-Integration.md)
-- [第9階段：Hugo 資源處理](./Build-9-Hugo-Resource-Processing.md)
-- [第10階段：專案展示與範例](./Build-10-Project-Showcase.md)
-- **第11階段：建構優化與 SEO**（當前階段）
-- [第12階段：測試和驗證](./Build-12-Testing-Validation.md)
-- [第13階段：常見問題與疑難排解](./Build-13-Common-Issues.md)
+- [階段 1：環境準備與驗證](./Build-1-Environment-Setup.md)
+- [階段 2：Hugo 專案初始化](./Build-2-Hugo-Initialization.md)
+- [階段 3：主題架構建立](./Build-3-Theme-Architecture.md)
+- [階段 4：基礎 HTML 模板](./Build-4-Base-Templates.md)
+- [階段 5：前端技術整合](./Build-5-Frontend-Integration.md)
+- [階段 6：Hugo 配置系統](./Build-6-Hugo-Configuration.md)
+- [階段 7：Alpine.js 整合](./Build-7-Alpinejs-Integration.md)
+- [階段 8：CSS 框架整合與自定義元件](./Build-8-CSS-Framework-Integration.md)
+- [階段 9：Hugo 資源處理](./Build-9-Hugo-Resource-Processing.md)
+- [階段 10：專案展示與範例](./Build-10-Project-Showcase.md)
+- **階段 11：建構優化與 SEO**（當前階段）
+- [階段 12：測試和驗證](./Build-12-Testing-Validation.md)
+- [階段 13：常見問題與疑難排解](./Build-13-Common-Issues.md)
