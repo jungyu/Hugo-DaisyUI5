@@ -26,6 +26,9 @@
 **CLI 指令:**
 
 ```bash
+# 確保在 hugo-twda-v5 目錄中執行以下指令
+# cd hugo-twda-v5  # 如果尚未切換到此目錄
+
 # 建立元件樣式目錄
 mkdir -p themes/twda_v5/assets/css/components
 ```

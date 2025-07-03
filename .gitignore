@@ -1,3 +1,5 @@
-public/
-node_modules
+# Hugo + TailwindCSS v5 + DaisyUI v5 主題
+hugo-twda-v5
+
+# 忽略以下文件和目錄
 .DS_Store

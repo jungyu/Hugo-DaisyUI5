@@ -11,6 +11,9 @@
 **CLI 指令:**
 
 ```bash
+# 確保在 hugo-twda-v5 目錄中執行以下指令
+# cd hugo-twda-v5  # 如果尚未切換到此目錄
+
 # 創建 twda_v5 主題目錄結構
 mkdir -p themes/twda_v5
 
@@ -30,6 +33,9 @@ tree themes/twda_v5 -I 'node_modules'
 **CLI 指令:**
 
 ```bash
+# 確保在 hugo-twda-v5 目錄中執行以下指令
+# cd hugo-twda-v5  # 如果尚未切換到此目錄
+
 # 創建 theme.toml
 cat > themes/twda_v5/theme.toml << 'EOF'
 name = "TWDA v5"

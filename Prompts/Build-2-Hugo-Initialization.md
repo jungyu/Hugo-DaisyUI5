@@ -11,7 +11,11 @@
 **CLI 指令:**
 
 ```bash
-# 初始化 Hugo 專案 (需要在 Hugo-DaisyUI5 目錄內執行)
+# 創建並切換到 Hugo 專案目錄
+mkdir -p hugo-twda-v5
+cd hugo-twda-v5
+
+# 初始化 Hugo 專案 (需要在 ./hugo-twda-v5 目錄內執行)
 hugo new site . --force
 
 # 確認初始結構
@@ -34,6 +38,9 @@ ls -la
 **CLI 指令:**
 
 ```bash
+# 確保在 hugo-twda-v5 目錄中執行以下指令
+# cd hugo-twda-v5  # 如果尚未切換到此目錄
+
 # 初始化 Git 倉庫
 git init
 
@@ -68,6 +75,9 @@ EOF
 **CLI 指令:**
 
 ```bash
+# 確保在 hugo-twda-v5 目錄中執行以下指令
+# cd hugo-twda-v5  # 如果尚未切換到此目錄
+
 # 創建內容目錄結構
 mkdir -p content/blogs
 mkdir -p content/pages
@@ -155,6 +165,9 @@ EOF
 **CLI 指令:**
 
 ```bash
+# 確保在 hugo-twda-v5 目錄中執行以下指令
+# cd hugo-twda-v5  # 如果尚未切換到此目錄
+
 # 創建配置目錄結構 (Hugo v0.147.9 推薦)
 mkdir -p config/_default
 
@@ -225,6 +238,9 @@ EOF
 **CLI 指令:**
 
 ```bash
+# 確保在 hugo-twda-v5 目錄中執行以下指令
+# cd hugo-twda-v5  # 如果尚未切換到此目錄
+
 # 測試 Hugo 是否能正確啟動
 hugo server --bind 0.0.0.0 --port 1313 --logLevel info
 
@@ -232,7 +248,7 @@ hugo server --bind 0.0.0.0 --port 1313 --logLevel info
 # - Web Server is available at http://localhost:1313/
 # - Press Ctrl+C to stop
 
-# 檢查初始結構 (另開終端)
+# 檢查初始結構 (另開終端，記得切換到 hugo-twda-v5 目錄)
 tree -I 'node_modules|public|resources' -a
 ```
 
@@ -246,7 +262,7 @@ tree -I 'node_modules|public|resources' -a
 - [ ] 基礎內容文件已創建
 - [ ] 配置文件結構正確
 - [ ] Hugo server 能正常啟動
-- [ ] 可以訪問 http://localhost:1313
+- [ ] 可以訪問 <http://localhost:1313>
 
 **AI Prompt:**
 

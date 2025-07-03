@@ -13,6 +13,9 @@
 **CLI 指令:**
 
 ```bash
+# 確保在 hugo-twda-v5 目錄中執行以下指令
+# cd hugo-twda-v5  # 如果尚未切換到此目錄
+
 # 創建基礎模板 (baseof.html)
 cat > themes/twda_v5/layouts/_default/baseof.html << 'EOF'
 <!DOCTYPE html>

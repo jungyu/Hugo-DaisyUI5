@@ -26,6 +26,9 @@
 **CLI 指令:**
 
 ```bash
+# 確保在 hugo-twda-v5 目錄中執行以下指令
+# cd hugo-twda-v5  # 如果尚未切換到此目錄
+
 # 建立範例內容目錄
 mkdir -p content/zh-tw/{posts,pages,projects}
 
