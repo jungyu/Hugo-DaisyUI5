@@ -79,7 +79,11 @@ export default {
 ```css
 /* TailwindCSS v4 + DaisyUI v5 完整整合 */
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: light, dark, cupcake, dracula, autumn, emerald;
+  darkTheme: dark;
+  logs: false;
+}
 
 /* 自定義 CSS 變數與中文排版優化 */
 :root {
@@ -150,53 +154,19 @@ module.exports = {
     './assets/js/**/*.js'
   ],
   
-  theme: {
-    container: {
-      center: true,
-      padding: {
-        DEFAULT: '1rem',
-        md: '2rem'
-      }
-    },
-    extend: {
-      // 配置字體
-      fontFamily: {
-        'chinese': 'var(--font-chinese)',
-        'english': 'var(--font-english)', 
-        'mono': 'var(--font-mono)'
-      },
-      
-      // 自訂動畫效果
-      keyframes: {
-        'fade-in': {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' }
-        },
-        'slide-in-up': {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' }
-        }
-      },
-      animation: {
-        'fade-in': 'fade-in 0.5s ease-out',
-        'slide-in-up': 'slide-in-up 0.6s ease-out'
-      }
-    }
-  },
-  
   plugins: [
     require('@tailwindcss/typography')
-    // 注意：DaisyUI v5 不再需要在這裡配置，而是通過 CSS @plugin 導入
+    // 注意：DaisyUI v5 不再需要在這裡配置，改用 CSS @plugin 語法
   ]
 };
 ```
 
 **重要變更**:
 
-- **DaisyUI v5 新語法**: 使用 `@plugin "daisyui"` 在 CSS 中直接導入
+- **DaisyUI v5 新語法**: 使用 `@plugin "daisyui" { ... }` 在 CSS 中直接導入和配置
 - **移除 plugins 中的 daisyui**: 不再需要 `require('daisyui')`
-- **移除 daisyui 配置區塊**: 主題配置現在通過其他方式處理
-- **保留 darkMode 配置**: 仍然可以使用 `[data-theme="dark"]` 選擇器
+- **移除 daisyui 配置區塊**: 主題配置現在在 CSS 文件中處理
+- **簡化配置**: 只保留必要的 content 路徑和其他非 DaisyUI 插件
 
 ### 6. Hugo 模板整合
 
@@ -868,54 +838,43 @@ incompatibleFeatures.forEach(feature => {
 });
 ```
 
-### 10. 主要檔案清單與結構驗證
+## 最新修正 (2025年7月3日)
 
-完成此階段後，以下檔案應該存在且正確配置：
+**問題解決**: 修正 DaisyUI v5 主題切換只有 light/dark 有效的問題
 
-```text
-hugo-twda-v5/
-├── package.json                           # ✅ 包含正確的建構腳本和依賴
-├── package-lock.json                      # ✅ 自動生成的依賴鎖定檔案
-├── postcss.config.mjs                     # ✅ PostCSS v4 配置（ES6 模組）
-├── tailwind.config.js                     # ✅ Tailwind + DaisyUI 完整配置
-├── themes/twda_v5/
-│   ├── assets/css/
-│   │   └── app.css                        # ✅ 主要 CSS 源碼檔案
-│   ├── layouts/partials/
-│   │   ├── head.html                      # ✅ CSS 引用配置
-│   │   ├── scripts.html                   # ✅ JavaScript 和主題切換
-│   │   ├── header.html                    # ✅ 導航和主題切換按鈕
-│   │   └── footer.html                    # ✅ 頁腳樣式
-│   └── layouts/_default/
-│       └── baseof.html                    # ✅ 基礎模板結構
-├── static/css/
-│   └── app.css                            # ✅ 編譯後的 CSS（1-2MB）
-└── node_modules/                          # ✅ 所有依賴套件
-```
+### 關鍵修正內容
 
-#### 關鍵檔案內容檢查
+#### 1. CSS 文件配置 (`themes/twda_v5/assets/css/app-advanced.css`)
 
-**package.json 必要內容**
-
-```json
-{
-  "scripts": {
-    "build:css": "postcss themes/twda_v5/assets/css/app.css -o static/css/app.css",
-    "watch:css": "postcss themes/twda_v5/assets/css/app.css -o static/css/app.css --watch",
-    "dev": "npm run watch:css"
-  },
-  "devDependencies": {
-    "tailwindcss": "^4.1.11",
-    "@tailwindcss/postcss": "^4.1.11",
-    "daisyui": "^5.0.43",
-    "alpinejs": "^3.14.9",
-    "theme-change": "^2.5.0",
-    "@tailwindcss/typography": "^0.5.16"
-  }
+```css
+/* TailwindCSS v4 + DaisyUI v5 進階整合 */
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light, dark, cupcake, dracula, autumn, emerald;
+  darkTheme: dark;
+  logs: false;
 }
 ```
 
-**postcss.config.mjs 標準配置**
+#### 2. Tailwind 配置 (`tailwind.config.js`)
+
+```javascript
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './themes/twda_v5/layouts/**/*.html',
+    './themes/twda_v5/assets/js/**/*.js',
+    './content/**/*.md',
+    './layouts/**/*.html',
+    './assets/js/**/*.js'
+  ],
+  plugins: [
+    require('@tailwindcss/typography')
+  ]
+};
+```
+
+#### 3. PostCSS 配置 (`postcss.config.mjs`)
 
 ```javascript
 export default {
@@ -926,136 +885,12 @@ export default {
 }
 ```
 
-**tailwind.config.js 核心配置**
+### 重要變更說明
 
-```javascript
-module.exports = {
-  content: [
-    './themes/twda_v5/layouts/**/*.html',
-    './content/**/*.md'
-  ],
-  plugins: [
-    require('@tailwindcss/typography')
-    // 注意：DaisyUI v5 使用 @plugin "daisyui" 在 CSS 中導入
-  ]
-};
-```
-
-## AI 提示詞協助
-
-如果需要進一步協助，可以使用以下提示詞：
-
-### 🔧 故障排除提示詞
-
-```text
-請幫我檢查我的 Hugo 專案中 TailwindCSS v4 和 DaisyUI v5 的整合。
-
-當前問題：[描述具體問題]
-
-專案結構：
-- Hugo 版本：v0.147.9
-- Tailwind CSS：v4.1.11  
-- DaisyUI：v5.0.43
-- PostCSS：使用 @tailwindcss/postcss
-
-請特別檢查：
-1. postcss.config.mjs 配置是否正確
-2. tailwind.config.js 中的 content 路徑
-3. DaisyUI 插件是否正確載入
-4. 主題切換功能實作
-5. CSS 編譯是否成功
-
-提供具體的除錯步驟和修正建議。
-```
-
-### 🎨 主題客製化提示詞
-
-```text
-我想要客製化我的 Hugo + DaisyUI 專案的主題系統。
-
-需求：
-1. 建立自訂的主題配色方案
-2. 實作主題切換按鈕
-3. 支援系統偏好設定
-4. 中文排版最佳化
-
-請提供：
-1. DaisyUI 主題配置
-2. 主題切換 JavaScript 代碼
-3. CSS 變數設定
-4. Hugo 模板整合方式
-
-確保相容於 DaisyUI v5 和 Tailwind CSS v4。
-```
-
-### ⚡ 效能最佳化提示詞
-
-```text
-請幫我最佳化 Hugo + TailwindCSS + DaisyUI 專案的效能。
-
-當前狀況：
-- CSS 檔案大小：[檔案大小]
-- 編譯時間：[編譯時間]
-- 載入速度：[載入速度]
-
-請提供最佳化建議：
-1. CSS purging 策略
-2. 編譯速度改善
-3. 瀏覽器載入最佳化
-4. 生產環境配置
-
-包含具體的配置代碼和測試方法。
-```
-
-## 階段完成總結
-
-✅ **已完成項目：**
-
-1. **依賴套件安裝**
-   - Tailwind CSS v4.1.11 + PostCSS 整合
-   - DaisyUI v5.0.43 組件庫
-   - Alpine.js v3.14.9 響應式框架
-   - theme-change 主題切換工具
-
-2. **配置檔案設置**
-   - postcss.config.mjs（ES6 模組格式）
-   - tailwind.config.js（完整配置）
-   - package.json 建構腳本
-
-3. **CSS 架構建立**
-   - 完整的 CSS 整合檔案
-   - 中文排版最佳化
-   - 自訂動畫和工具類別
-
-4. **Hugo 模板整合**
-   - head.html CSS 引用
-   - scripts.html JavaScript 載入
-   - header.html 主題切換按鈕
-   - footer.html 響應式設計
-
-5. **建構與開發流程**
-   - 自動化 CSS 編譯
-   - 熱重載開發環境
-   - 效能監控工具
-
-## 下一階段準備
-
-✅ **階段 5 完成** - 前端技術整合  
-➡️ **進行階段 6** - [Hugo 配置優化](./Build-6-Hugo-Configuration.md)
-
-已為以下後續階段奠定基礎：
-- Alpine.js 深度整合
-- 組件系統開發  
-- SEO 和效能最佳化
-- PWA 功能實作
-
-## 參考資源
-
-- [Tailwind CSS v4 官方文件](https://tailwindcss.com/docs)
-- [DaisyUI v5 組件文件](https://daisyui.com/components/)
-- [PostCSS 設定指南](https://postcss.org/docs/)
-- [Alpine.js 官方文件](https://alpinejs.dev/)
-- [theme-change 使用指南](https://github.com/saadeghi/theme-change)
+- **DaisyUI v5 新語法**: 使用 `@plugin "daisyui" { ... }` 在 CSS 中配置主題
+- **移除 tailwind.config.js 中的 DaisyUI**: 不再需要 `require('daisyui')` 和 `daisyui: {...}` 配置
+- **主題完全生效**: 所有官方主題 (light, dark, cupcake, dracula, autumn, emerald) 現在都能正常切換
+- **新色彩變數格式**: 使用 `--color-primary` 格式，支援 OKLCH 色彩空間
 
 ---
 
@@ -1092,12 +927,6 @@ npm install -D @tailwindcss/postcss@^4.1.11 postcss@^8.5.6 autoprefixer@^10.4.21
 ```
 
 #### 2. DaisyUI 樣式未載入
-
-**問題症狀**:
-- DaisyUI 組件類別（如 `.btn`, `.card`）無效果
-- 編譯的 CSS 中找不到 DaisyUI 標記
-
-### DaisyUI v5 故障排除
 
 **問題症狀**:
 - DaisyUI 組件類別（如 `.btn`, `.card`）無效果
@@ -1213,7 +1042,7 @@ ls -lh static/css/app.css
 grep -i "daisyui" static/css/app.css
 
 # 檢查 Tailwind 基礎類別
-grep -E "(\.text-|\.bg-|\.p-)" static/css/app.css | head -5
+grep -E "(\.text-|\.bg-|\.p-|\.m-" static/css/app.css | head -5
 
 # 檢查 DaisyUI 組件類別
 grep -E "(\.btn|\.card|\.navbar|\.modal)" static/css/app.css | head -10
